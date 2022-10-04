@@ -1,4 +1,4 @@
-{% extends 'body.html' %}
+{% extends 'layout.html' %}
 {% load static %}
 {% block head %}
     <link rel="stylesheet" href="{% static 'lib/datatables-1.10.20/css/dataTables.bootstrap4.min.css' %}"/>
@@ -8,7 +8,12 @@
     <script src="{% static 'lib/datatables-1.10.20/js/dataTables.bootstrap4.min.js' %}"></script>
     <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/dataTables.responsive.min.js' %}"></script>
     <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/responsive.bootstrap4.min.js' %}"></script>
+    
+    {% block head_list %}
+    
+    {% endblock %}
 {% endblock %}
+
 {% block content %}
     <div class="card card-default">
         <div class="card-header">
@@ -19,7 +24,7 @@
         </div>
 
         <div class="card-body">
-            <table class="table" id="id_table">
+            <table class="table" id="data">
                 <thead>
                 {% block columns %}
 
@@ -33,22 +38,37 @@
             </table>
         </div>
         <div class="card-footer">
-            <button class="btn btn-primary btn-flat">
+            <a href="{{ create_url }}" class="btn btn-primary btn-flat btnTest">
                 <i class="fas fa-plus"></i>Nuevo registro
-            </button>
+            </a>
         </div>
 
     </div>
 {% endblock %}
 {% block javascript %}
     <script>
-        $(function(){
-           $('#id_table').DataTable({
-               responsive:true,
-               //Para que no se ajuste el tamaño de las tablas y lo asignemos manual.
-               //Y respete los tamaños puestos en cada th
-               autoWidth: false
-           });
+        $(function () {
+            $('#id_table').DataTable({
+                responsive: true,
+                //Para que no se ajuste el tamaño de las tablas y lo asignemos manual.
+                //Y respete los tamaños puestos en cada th
+                autoWidth: false
+            });
+
+            $('.btnTest').on('click', function () {
+                $.ajax({
+                    url: '{% url 'erp:category_listview' %}',
+                    type: 'POST',
+                    data: {id:1},
+                    dataType:'json'
+                }).done(function(data){
+                    console.log(data);
+                }).fail(function(data){
+                    alert('Sin exito');
+                }).always(function(data){
+                   alert('Complete');
+                });
+            });
         });
     </script>
 {% endblock %}

@@ -8,7 +8,7 @@ SQLITE = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         #ruta del proyecto / dirección donde quieras guardar la db
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': str(BASE_DIR / 'db.sqlite3'),
     }
 }
 
