@@ -16,8 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from core.homepage.views import IndexView
+from core.login.views import LoginFormView2
+
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('erp/', include(('core.erp.urls','erp'))),
-    path('', IndexView.as_view()),
+    path('login/', include(('core.login.urls','accounts'))),
+    path('', IndexView.as_view(), name='index'),
 ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

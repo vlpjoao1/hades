@@ -47,23 +47,16 @@
             //aquí hacemos referencia al formulario
             //Esto obtiene a forma de diccionario todos los datos del formulario
             var params = $(this).serializeArray();
-            $.ajax({
-                url: window.location.pathname,
-                type: 'POST',
-                data: params,
-                dataType: 'json'
-            }).done(function (data) {
-                //si no contiene eso
-                if (!data.hasOwnProperty('error')) {
-                    location.href = '{{ list_url }}';
-                    return false
-                }
-                message_error(data.error);
-            }).fail(function (data) {
-                //alert('Sin exito');
-            }).always(function (data) {
-                //alert('Complete');
+            $('form').on('submit', function (e) {
+            e.preventDefault();
+            //aquí hacemos referencia al formulario
+            //Esto obtiene a forma de diccionario todos los datos del formulario
+            var parameters = $(this).serializeArray();
+            submit_with_ajax(window.location.pathname,'Notificación','¿Estás seguro de que deseas realizar la siguiente acción?',
+                parameters, function(){
+                location.href = '{{ list_url }}'
             });
+        });
         });
     </script>
 {% endblock %}

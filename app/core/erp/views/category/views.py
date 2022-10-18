@@ -29,6 +29,7 @@ class CategoryList(ListView):
     # redireccionar a la peticion que se haga, sea post o get.
     # @method_decorator(login_required)
     @method_decorator(csrf_exempt)
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
@@ -74,6 +75,10 @@ class CategoryCreateView(CreateView):
     # Reverse_lazy devuelve la cadena de texto de esa url
     success_url = reverse_lazy('erp:category_listview')
 
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Crear una categoría'
@@ -96,7 +101,7 @@ class CategoryCreateView(CreateView):
             else:
                 data['error'] = 'No ha ingresado ninguna opción'
         except Exception as e:
-            pass
+            data['error'] = str(e)
         return JsonResponse(data)
         """Este codigo sería para retornar los errores sin ajax"""
         # form = self.form_class(request.POST)
@@ -119,8 +124,8 @@ class CategoryUpdateView(UpdateView):
     template_name = 'category/create.html'
     success_url = reverse_lazy('erp:category_listview')
 
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
-
         self.object = self.get_object()
         return super().dispatch(request, *args, **kwargs)
 
@@ -151,6 +156,7 @@ class CategoryDeleteView(DeleteView):
     template_name = 'category/delete.html'
     success_url = reverse_lazy('erp:category_listview')
 
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         # lo creamos en el dispatch porque al sobreescribir el metodo POST no existe de una el self.object
         self.object = self.get_object()

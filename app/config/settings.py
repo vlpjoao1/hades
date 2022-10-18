@@ -43,9 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_seed',
+    'widget_tweaks',
     #apps
     'core.erp',
     'core.homepage',
+    'core.login',
 ]
 
 MIDDLEWARE = [
@@ -127,3 +129,14 @@ STATICFILES_DIRS=[
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#-- login config
+LOGIN_REDIRECT_URL = '/erp/dashboard/'
+LOGOUT_REDIRECT_URL = '/login/'
+
+#en caso de un PageNotFound que redirija al login
+LOGIN_URL='/login/'
+
+#media config
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_URL = '/media/'
