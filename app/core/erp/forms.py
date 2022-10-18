@@ -88,16 +88,16 @@ class ProductForm(ModelForm):
                 }
             ),
         }
-    # def save(self, commit=True):
-    #     data = {}
-    #     # con esto, recuperamos el formulario
-    #     # podríamos hacerlo con self tambien
-    #     form = super()
-    #     try:
-    #         if form.is_valid():
-    #             form.save()
-    #         else:
-    #             data['error'] = form.errors
-    #     except Exception as e:
-    #         data['error'] = str(e)
-    #     return data
+    def save(self, commit=True):
+        data = {}
+        # con esto, recuperamos el formulario
+        # podríamos hacerlo con self tambien
+        form = super()
+        try:
+            if form.is_valid():
+                form.save()
+            else:
+                data['error'] = form.errors
+        except Exception as e:
+            data['error'] = str(e)
+        return data

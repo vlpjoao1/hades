@@ -41,7 +41,12 @@ function submit_with_ajax(url,title,content, parameters, callback) {
                         url: url, //window.location.pathname
                         type: 'POST',
                         data: parameters,
-                        dataType: 'json'
+                        dataType: 'json',
+                        /* Esto se agrega al momento de enviar FILES en el formulario */
+                            //Para que los datos enviados se transformen en un string
+                            processData: false,
+                            //Que no configure el tipo de dato recibido del servidor
+                            contentType: false,
                     }).done(function (data) {
                         console.log(data);
                         if (!data.hasOwnProperty('error')) {

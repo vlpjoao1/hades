@@ -58,14 +58,19 @@
                 icon: 'error',
             })
         {% endif %}
-        {#$('form').on('submit', function (e) {#}
-        {#    e.preventDefault();#}
-        {#    //aquí hacemos referencia al formulario#}
-        {#    //Esto obtiene a forma de diccionario todos los datos del formulario#}
-        {#    var parameters = $(this).serializeArray();#}
-        {#    submit_with_ajax(window.location.pathname,'Notificación','¿Estás seguro de que deseas realizar la siguiente acción?',parameters, function(){#}
-        {#        location.href = '{{ list_url }}'#}
-        {#    });#}
-        {# });#}
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            //aquí hacemos referencia al formulario
+            //Esto obtiene a forma de diccionario todos los datos del formulario
+                //Serializa los datos obtenidos del formulario
+            //var parameters = $(this).serializeArray();
+            //El formdata incluye los archivos FILES, Le pasamos el formulario como argumento
+            var parameters = new FormData(this);
+            // new FormData($('form')[0]) -> Si tenemos varios formularios y queremos escoger 1
+            //parameters.forEach((key,value)=>console.log(key+':'+value)); -> si queremos iterar cada valor
+            submit_with_ajax(window.location.pathname,'Notificación','¿Estás seguro de que deseas realizar la siguiente acción?',parameters, function(){
+                location.href = '{{ list_url }}'
+            });
+         });
     </script>
 {% endblock %}

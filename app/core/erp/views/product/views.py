@@ -35,6 +35,7 @@ class ProductList(ListView):
         context['list_url'] = reverse_lazy('erp:product_listview')
         return context
 
+
 """
     Estas vistas se pueden usar solamente poniendo el modelo, el formulario y el template.
     Sobreescribir los métodos, ya es más para personalización.
@@ -60,22 +61,18 @@ class ProductCreateView(CreateView):
         context['action'] = 'add'
         return context
 
-    # def post(self, request, *kargs, **kwargs):
-    #     data = {}
-    #     try:
-    #         action = request.POST['action']
-    #         if action == 'add':
-    #             form = self.form_class(request.POST)
-    #             data = form.save()
-    #             # if form.is_valid():
-    #             #     form.save()
-    #             # else:
-    #             #     data['error'] = form.errors
-    #         else:
-    #             data['error'] = 'No ha ingresado ninguna opción'
-    #     except Exception as e:
-    #         data['error'] = str(e)
-    #     return JsonResponse(data)
+    def post(self, request, *kargs, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'add':
+                form = self.get_form()
+                data = form.save()
+            else:
+                data['error'] = 'No ha ingresado ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data)
 
         """Este codigo sería para retornar los errores sin ajax"""
         # form = self.form_class(request.POST)
@@ -154,15 +151,18 @@ class ProductDeleteView(DeleteView):
         context['action'] = 'delete'
         return context
 
+
 """Para que formview guarde/edite/eliminte datos debes sobreescribir los métodos,
     sin sobreescribir, el solo hará las validaciones correspondientes del formulario.
 """
+
+
 class ProductFormView(FormView):
     form_class = ProductForm
     template_name = 'product/create.html'
     success_url = reverse_lazy('erp:product_listview')
 
-    #Aqui se manejan los errores del formulario
+    # Aqui se manejan los errores del formulario
     def form_invalid(self, form):
         print(form.errors)
         return super().form_invalid(form)
