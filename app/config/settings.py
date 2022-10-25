@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 from pathlib import Path
 import config.db as db
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -32,7 +33,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_seed',
     'widget_tweaks',
-    #apps
+    # apps
     'core.erp',
     'core.homepage',
     'core.login',
@@ -59,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'crum.CurrentRequestUserMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -66,7 +67,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,7 +81,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -105,7 +105,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -117,13 +116,12 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS=[
-    os.path.join(BASE_DIR,"static"),
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
 ]
 
 # Default primary key field type
@@ -131,15 +129,15 @@ STATICFILES_DIRS=[
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#-- login config
+# -- login config
 LOGIN_REDIRECT_URL = '/erp/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
 
-#en caso de un PageNotFound que redirija al login
-LOGIN_URL='/login/'
+# en caso de un PageNotFound que redirija al login
+LOGIN_URL = '/login/'
 
-#media config
+# media config
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
-AUTH_USER_MODEL='user.User'
+AUTH_USER_MODEL = 'user.User'

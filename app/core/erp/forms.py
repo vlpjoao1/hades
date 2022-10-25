@@ -21,6 +21,7 @@ class CategoryForm(ModelForm):
     class Meta:
         model = Category
         fields = '__all__'
+        exclude=['user_updated', 'user_creation']
         widgets = {
             'name': TextInput(
                 attrs={

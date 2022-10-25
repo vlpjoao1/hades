@@ -1,3 +1,4 @@
+from crum import get_current_user
 from django.db import models
 from datetime import datetime
 
@@ -5,20 +6,34 @@ from django.forms import model_to_dict
 
 from config.settings import MEDIA_URL, STATIC_URL
 from core.erp.choices import gender_choices
+from core.models import BaseModel
 
 
-class Category(models.Model):
+class Category(BaseModel):
     name = models.CharField(max_length=150, verbose_name='Nombre', unique=True)
     desc = models.CharField(max_length=500, null=True, blank=True, verbose_name='Descripción')
 
     def __str__(self):
-        return 'Nro:{} / Nombre: {}'.format(self.id,self.name)
+        return 'Nro:{} / Nombre: {}'.format(self.id, self.name)
 
     def toJson(self):
-        #item = {'id':self.id, 'name':self.name}
-        #Con esto convertirmos el resultado en dict, y a model to dict le pasamos la instancia del objeto actual
+        # item = {'id':self.id, 'name':self.name}
+        # Con esto convertirmos el resultado en dict, y a model to dict le pasamos la instancia del objeto actual
         item = model_to_dict(self)
         return item
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        #Obtiene el usuario actual con django-CRUM
+        user = get_current_user()
+        if user is not None:
+            #Si es creacion no tiene PK
+            if not self.pk:
+                self.user_creation = user
+            #si es UPDATE
+            else:
+                self.user_updated = user
+        super(Category, self).save()
 
     class Meta:
         verbose_name = 'Categoria'
@@ -38,7 +53,7 @@ class Product(models.Model):
     def get_image(self):
         if self.image:
             return '{}{}'.format(MEDIA_URL, self.image)
-        #imagen por defecto si no se ingresó imagen
+        # imagen por defecto si no se ingresó imagen
         return '{}{}'.format(STATIC_URL, 'img/empty.png')
 
     class Meta:
@@ -94,9 +109,6 @@ class DetSale(models.Model):
         verbose_name = 'Detalle de Venta'
         verbose_name_plural = 'Detalle de Ventas'
         ordering = ['id']
-
-
-
 
 
 """
