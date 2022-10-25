@@ -3,6 +3,7 @@ from core.erp.views.category.views import category_list, CategoryList, CategoryC
     CategoryDeleteView, CategoryFormView
 from core.erp.views.dashborad.views import DashboardView
 from core.erp.views.product.views import ProductList, ProductCreateView, ProductUpdateView, ProductDeleteView
+from core.erp.views.tests.views import TestView
 
 urlpatterns = [
     path('category/list/', CategoryList.as_view(), name='category_listview'),
@@ -17,4 +18,6 @@ urlpatterns = [
     path('product/delete/<int:pk>/', ProductDeleteView.as_view(), name='product_deleteview'),
     #dashboard
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    #test
+    path('test/', TestView.as_view(), name='test'),
 ]

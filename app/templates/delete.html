@@ -48,7 +48,7 @@
             //Esto obtiene a forma de diccionario todos los datos del formulario
             var parameters = new FormData(this);
             // new FormData($('form')[0]) -> Si tenemos varios formularios y queremos escoger 1
-            //parameters.forEach((key,value)=>console.log(key+':'+value)); -> si queremos iterar cada valor
+            //parameters.forEach((key,value)=>console.log(key+':'+value)); ->    si queremos iterar cada valor
             submit_with_ajax(window.location.pathname,'Notificación','¿Estás seguro de que deseas realizar la siguiente acción?',parameters, function(){
                 location.href = '{{ list_url }}'
             });

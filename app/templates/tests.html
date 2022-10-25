@@ -1,0 +1,89 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'lib/select2-4.0.13/css/select2.min.css' %}">
+    {# Para poder cargar el tema de bootstrap #}
+    <link rel="stylesheet" href="{% static 'lib/select2-4.0.13/css/select2-bootstrap4.min.css' %}">
+    <script src="{% static 'lib/select2-4.0.13/js/select2.min.js' %}"></script>
+    {# Para escoger el idioma #}
+    <script src="{% static 'lib/select2-4.0.13/js/i18n/es.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <form action="." method="POST" enctype="multipart/form-data">
+        <div class="card card-default">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-plus"></i>
+                    {{ title }}
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Categorias</label>
+                    {{ form.categories }}
+                </div>
+                <div class="form-group">
+                    <label>Productos</label>
+                    {{ form.products }}
+                </div>
+            </div>
+        </div>
+    </form>
+    <script>
+        /* Declaramos los productos desde el inicio */
+        var select_products = $('select[name="products"]');
+        $(() => {
+            $('.select2').select2({
+                //podemos escoger temas para el select2
+                theme: 'bootstrap4',
+                language: 'es'
+            });
+
+            $('select[name="categories"]').on('change', function () {
+                var id = $(this).val();
+                //Creamos las opciones del select
+                var options = '<option value="">-----------</option>';
+                /* Para evitar mandar valores con id vacío
+                * */
+                if (id === '') {
+                    select_products.html(options);
+                    //terminamos el proceso aquí
+                    return false;
+                }
+                $.ajax({
+                    url: window.location.pathname, //window.location.pathname
+                    type: 'POST',
+                    data: {
+                        'action': 'search_product_id',
+                        'id': id
+                    },
+                    dataType: 'json',
+                }).done(function (data) {
+                    if (!data.hasOwnProperty('error')) {
+                        // iteramos una colección de elementos
+                        //iteramos por los dos valores
+                        /*$.each(data, function (key, value) {
+                            options += '<option value="' + value.id + '">' + value.name + '</option>'
+                        });*/
+                        // lo limpiamos e inicializmos el formulario
+                        select_products.html('').select2({
+                            //podemos escoger temas para el select2
+                            theme: 'bootstrap4',
+                            language: 'es',
+                            //Le pasamos la data desde aquí
+                            data:data
+                        });
+                        return false;
+                    }
+                    message_error(data.error);
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    alert(textStatus + ': ' + errorThrown);
+                }).always(function (data) {
+                    /* Le pasamos los elementos que iteramos */
+                    //select_products.html(options);
+                });
+            });
+
+        })
+    </script>
+{% endblock %}
