@@ -35,12 +35,10 @@ class ProductList(ListView):
         context['list_url'] = reverse_lazy('erp:product_listview')
         return context
 
-
 """
     Estas vistas se pueden usar solamente poniendo el modelo, el formulario y el template.
     Sobreescribir los métodos, ya es más para personalización.
 """
-
 
 class ProductCreateView(CreateView):
     model = Product
@@ -164,11 +162,9 @@ class ProductFormView(FormView):
 
     # Aqui se manejan los errores del formulario
     def form_invalid(self, form):
-        print(form.errors)
         return super().form_invalid(form)
 
     def form_valid(self, form):
-        print(form.is_valid())
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):

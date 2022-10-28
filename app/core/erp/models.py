@@ -24,13 +24,13 @@ class Category(BaseModel):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        #Obtiene el usuario actual con django-CRUM
+        # Obtiene el usuario actual con django-CRUM
         user = get_current_user()
         if user is not None:
-            #Si es creacion no tiene PK
+            # Si es creacion no tiene PK
             if not self.pk:
                 self.user_creation = user
-            #si es UPDATE
+            # si es UPDATE
             else:
                 self.user_updated = user
         super(Category, self).save()
@@ -66,12 +66,20 @@ class Client(models.Model):
     names = models.CharField(max_length=150, verbose_name='Nombres')
     surnames = models.CharField(max_length=150, verbose_name='Apellidos')
     dni = models.CharField(max_length=10, unique=True, verbose_name='Dni')
-    birthday = models.DateField(default=datetime.now, verbose_name='Fecha de nacimiento')
+    date_birthday = models.DateField(default=datetime.now, verbose_name='Fecha de nacimiento')
     address = models.CharField(max_length=150, null=True, blank=True, verbose_name='Dirección')
-    sexo = models.CharField(max_length=10, choices=gender_choices, default='male', verbose_name='Sexo')
+    gender = models.CharField(max_length=10, choices=gender_choices, default='male', verbose_name='Sexo')
 
     def __str__(self):
         return self.names
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        #https: // dustindavis.me / blog / django - tip - get_field_display / Se usa para los choices
+        item['gender'] = self.get_gender_display()
+        #formateo el date_birthday
+        item['date_birthday'] = self.date_birthday.strftime('%Y-%m-%d')
+        return item
 
     class Meta:
         verbose_name = 'Cliente'

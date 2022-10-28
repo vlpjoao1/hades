@@ -21,4 +21,3 @@ from core.erp.models import *
 #         name = ''.join(random.choices(letters, k=5))
 #     Category(name=name).save()
 #     print('Guardado registro {}'.format(i))
-
