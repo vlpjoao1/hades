@@ -76,7 +76,8 @@ class Client(models.Model):
     def toJSON(self):
         item = model_to_dict(self)
         #https: // dustindavis.me / blog / django - tip - get_field_display / Se usa para los choices
-        item['gender'] = self.get_gender_display()
+        #lo pasamos con ID y su genero para diferenciarlo por su ID
+        item['gender'] = {'id':self.gender, 'name':self.get_gender_display()}
         #formateo el date_birthday
         item['date_birthday'] = self.date_birthday.strftime('%Y-%m-%d')
         return item

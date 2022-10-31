@@ -1,6 +1,7 @@
 // Creamos una funcion para refrescar el datatable solo llamandolo
 var tbClient;
-function getData(){
+
+function getData() {
     //Asignamos el datatable a una variable para poder acceder a sus metodos
     tbClient = $('#data').DataTable({
         responsive: true,
@@ -23,7 +24,7 @@ function getData(){
             {"data": "surnames"},
             {"data": "dni"},
             {"data": "date_birthday"},
-            {"data": "gender"},
+            {"data": "gender.name"},
             {"data": "id"},
         ],
         //definimos las columnas una por una, especificando su posicion
@@ -33,7 +34,8 @@ function getData(){
                 class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    var buttons = '<a href="#" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
+                    //Rel establece el tipo de relacion entre el vincunlo y el documento asociado
+                    var buttons = '<a href="#" rel="edit" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
                     buttons += '<a href="#" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
                     return buttons;
                 }
@@ -46,19 +48,55 @@ function getData(){
     });
 };
 $(function () {
+    // Seleccionamos el titulo del modal para poder modificar lo que este dentro de el
+    modal_title = $('.modal-title');
+
     getData();
-    // Cosas que pasaran cuando presiones el boton Add
-    $('.btnAdd').on('click', function(){
+    // Crear Cliente---------------------------
+    $('.btnAdd').on('click', function () {
         // Agregamos el valor add ya que desde JS cambiaremos a editar
         $('input[name="action"]').val('add');
+
+        //Modificamos el span del modal_header desde aqui
+        modal_title.find('span').html(' Creacion de un cliente');
+        modal_title.find('i').removeClass().addClass('fas fa-plus')
+
         //Se hace de esta forma por si hay varios formularios
         //$('form')[0].reset();
         $('#myModalClient').modal('show');
     });
+    //End-Crear Cliente------------------------
+
+    //Editar Cliente---------------------------
+    $('#data tbody').on('click', 'a[rel="edit"]', function () {
+        modal_title.find('span').html(' Edicion de un cliente');
+        modal_title.find('i').removeClass().addClass('fas fa-edit')
+        /* tbClient es la tabla que ya inicializamos
+        * le pasamos como parametro el row actual
+        * parents obtiene el elemento padre del THIS que le pasemos
+        * data obtiene la DATA de ese row
+        * */
+        //Obtenemos el padre si es un LI o un TD
+        var tr = tbClient.cell($(this).closest('td, li')).index();
+        // pasamos el row de ese TR y obtenemos la data
+        var data = tbClient.row(tr.row).data();
+        $('input[name="action"]').val('edit');
+        $('input[name="id"]').val(data.id);
+        $('input[name="names"]').val(data.names);
+        $('input[name="surnames"]').val(data.names);
+        $('input[name="dni"]').val(data.names);
+        $('input[name="date_birthday"]').val(data.names);
+        $('input[name="addres"]').val(data.names);
+        //Como en el gender tambien tiene la propiedad ID lo seleccionamos por su ID
+        $('select[name="gender"]').val(data.gender.id);
+        //abrimos el modal despues de setearle los datos.
+        $('#myModalClient').modal('show');
+    });
+    //End-Editar Cliente-----------------------
 
     //Cuando se oculte el modal ejecute esta funcion
-    $('#myModalClient').on('shown.bs.modal', function(){
-        $('form')[0].reset();
+    $('#myModalClient').on('shown.bs.modal', function () {
+        //$('form')[0].reset();
     });
 
     $('form').on('submit', function (e) {

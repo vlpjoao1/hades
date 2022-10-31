@@ -41,6 +41,23 @@ class ClientView(TemplateView):
                 cli.address = request.POST['address']
                 cli.gender = request.POST['gender']
                 cli.save()
+            elif action == 'edit':
+                """
+                    Manejamos los datos con request.POST y no con get_form ya que
+                    no estamos trabajando directamente con la vista sinno que estamos
+                    abriendo un modal que no pertenece a una vista y estamos pasando el form
+                    desde el get_context_data y no como un formulario de la vista
+                """
+                #Nuestra instancia sera una consulta, debe ser una consulta
+                cli = Client.objects.get(pk=request.POST['id'])
+                #recuperamos todos los valores del cliente
+                cli.names = request.POST['names']
+                cli.surnames = request.POST['surnames']
+                cli.dni = request.POST['dni']
+                cli.date_birthday = request.POST['date_birthday']
+                cli.address = request.POST['address']
+                cli.gender = request.POST['gender']
+                cli.save()
             else:
                 data['error'] = 'Ha ocurrido un error'
         except Exception as e:
