@@ -36,7 +36,7 @@ function getData() {
                 render: function (data, type, row) {
                     //Rel establece el tipo de relacion entre el vincunlo y el documento asociado
                     var buttons = '<a href="#" rel="edit" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a> ';
-                    buttons += '<a href="#" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
+                    buttons += '<a href="#" rel="delete" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
                     return buttons;
                 }
             },
@@ -68,30 +68,48 @@ $(function () {
     //End-Crear Cliente------------------------
 
     //Editar Cliente---------------------------
-    $('#data tbody').on('click', 'a[rel="edit"]', function () {
-        modal_title.find('span').html(' Edicion de un cliente');
-        modal_title.find('i').removeClass().addClass('fas fa-edit')
-        /* tbClient es la tabla que ya inicializamos
-        * le pasamos como parametro el row actual
-        * parents obtiene el elemento padre del THIS que le pasemos
-        * data obtiene la DATA de ese row
+    $('#data tbody')
+        .on('click', 'a[rel="edit"]', function () {
+            modal_title.find('span').html(' Edicion de un cliente');
+            modal_title.find('i').removeClass().addClass('fas fa-edit')
+            /* tbClient es la tabla que ya inicializamos
+            * le pasamos como parametro el row actual
+            * parents obtiene el elemento padre del THIS que le pasemos
+            * data obtiene la DATA de ese row
+            * */
+            //Obtenemos el padre si es un LI o un TD
+            var tr = tbClient.cell($(this).closest('td, li')).index();
+            // pasamos el row de ese TR y obtenemos la data
+            var data = tbClient.row(tr.row).data();
+            // set values on form-----------------------------
+            $('input[name="action"]').val('edit');
+            $('input[name="id"]').val(data.id);
+            $('input[name="names"]').val(data.names);
+            $('input[name="surnames"]').val(data.names);
+            $('input[name="dni"]').val(data.names);
+            $('input[name="date_birthday"]').val(data.names);
+            $('input[name="addres"]').val(data.names);
+            //Como en el gender tambien tiene la propiedad ID lo seleccionamos por su ID
+            $('select[name="gender"]').val(data.gender.id);
+            //abrimos el modal despues de setearle los datos.
+            $('#myModalClient').modal('show');
+        })
+        /*Como estamos haciendo referencia a la misma tabla podemos
+            concatenar las acciones, asi se ejecuta una o la otra.
         * */
-        //Obtenemos el padre si es un LI o un TD
-        var tr = tbClient.cell($(this).closest('td, li')).index();
-        // pasamos el row de ese TR y obtenemos la data
-        var data = tbClient.row(tr.row).data();
-        $('input[name="action"]').val('edit');
-        $('input[name="id"]').val(data.id);
-        $('input[name="names"]').val(data.names);
-        $('input[name="surnames"]').val(data.names);
-        $('input[name="dni"]').val(data.names);
-        $('input[name="date_birthday"]').val(data.names);
-        $('input[name="addres"]').val(data.names);
-        //Como en el gender tambien tiene la propiedad ID lo seleccionamos por su ID
-        $('select[name="gender"]').val(data.gender.id);
-        //abrimos el modal despues de setearle los datos.
-        $('#myModalClient').modal('show');
-    });
+        .on('click', 'a[rel="delete"]', function () {
+            var tr = tbClient.cell($(this).closest('td, li')).index();
+            var data = tbClient.row(tr.row).data();
+            //Lo enviamos con ajax debido a que el EDIT tenia un formulario
+            var parameters = new FormData();
+            //pasamos el action y el id de lo que eliminaremos.
+            parameters.append('action', 'delete');
+            parameters.append('id', data.id);
+            submit_with_ajax(window.location.pathname, 'Notificación', '¿Estás seguro de que deseas eliminar el siguiente registro?', parameters, function () {
+                //Con esto podemos reload el ajax https://datatables.net/reference/api/ajax.reload()
+                tbClient.ajax.reload();
+            });
+        });
     //End-Editar Cliente-----------------------
 
     //Cuando se oculte el modal ejecute esta funcion
