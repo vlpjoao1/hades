@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
 from core.erp.forms import TestForm
-from core.erp.models import Product
+from core.erp.models import Product, Category
 
 
 class TestView(TemplateView):
@@ -28,11 +28,21 @@ class TestView(TemplateView):
                 data = [{'id':'', 'text':'-------'}]
                 for i in Product.objects.filter(cat_id=request.POST['id']):
                     data.append({'id': i.id, 'text': i.name})
+            elif action == 'autocomplete':
+                # data sera un array para devolver un array
+                data=[]
+                #Evitamos mandar todos los registros [0:10] para no sobrecargar el sistema
+                for i in Category.objects.filter(name__icontains=request.POST['term'])[0:10]:
+                    # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete
+                    item = i.toJson()
+                    item['value'] = i.name
+                    data.append(item)
             else:
                 data['error'] = 'Ha ocurrido un error'
 
             # data = Category.objects.get(pk=request.POST['id']).toJson()
         except Exception as e:
+            data={}
             data['error'] = str(e)
         #Para serializar los elementos que no sean diccionaros, debes establecer safe=False
         #Ya que estamos enviando una lista de diccionarios, no un diccionario solo

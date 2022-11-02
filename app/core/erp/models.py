@@ -19,7 +19,7 @@ class Category(BaseModel):
     def toJson(self):
         # item = {'id':self.id, 'name':self.name}
         # Con esto convertirmos el resultado en dict, y a model to dict le pasamos la instancia del objeto actual
-        item = model_to_dict(self)
+        item = model_to_dict(self, exclude=['user_creation','user_updated'])#Podemos excluir valores
         return item
 
     def save(self, force_insert=False, force_update=False, using=None,

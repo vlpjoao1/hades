@@ -1,6 +1,10 @@
 {% extends 'layout.html' %}
 {% load static %}
 {% block head %}
+    <!-- JQUERY UI -->
+    <link rel="stylesheet" href="{% static 'lib/jquery-ui-1.13.2/jquery-ui.min.css' %}">
+    <script src="{% static 'lib/jquery-ui-1.13.2/jquery-ui.min.js' %}"></script>
+
     <link rel="stylesheet" href="{% static 'lib/select2-4.0.13/css/select2.min.css' %}">
     {# Para poder cargar el tema de bootstrap #}
     <link rel="stylesheet" href="{% static 'lib/select2-4.0.13/css/select2-bootstrap4.min.css' %}">
@@ -26,6 +30,10 @@
                     <label>Productos</label>
                     {{ form.products }}
                 </div>
+                <div class="form-group">
+                    <label>Buscador</label>
+                    {{ form.search }}
+                </div>
             </div>
         </div>
     </form>
@@ -38,7 +46,7 @@
                 theme: 'bootstrap4',
                 language: 'es'
             });
-
+            //Ajax charge values o anidated select
             $('select[name="categories"]').on('change', function () {
                 var id = $(this).val();
                 //Creamos las opciones del select
@@ -71,7 +79,7 @@
                             theme: 'bootstrap4',
                             language: 'es',
                             //Le pasamos la data desde aquí
-                            data:data
+                            data: data
                         });
                         return false;
                     }
@@ -84,6 +92,60 @@
                 });
             });
 
+            //JQUERY UI AUTOCOMPLETE
+            // https://api.jqueryui.com/autocomplete/
+            /*var availableTags = [
+                "ActionScript",
+                "AppleScript",
+                "Asp",
+                "BASIC",
+                "C",
+                "C++",
+                "Clojure",
+                "COBOL",
+                "ColdFusion",
+                "Erlang",
+                "Fortran",
+                "Groovy",
+                "Haskell",
+                "Java",
+                "JavaScript",
+                "Lisp",
+                "Perl",
+                "PHP",
+                "Python",
+                "Ruby",
+                "Scala",
+                "Scheme"
+            ];*/
+            $('input[name="search"]').autocomplete({
+                //source: availableTags,
+                source: function (request, response) {
+                    $.ajax({
+                        url: window.location.pathname,
+                        type: 'POST',
+                        data: {
+                            'action':'autocomplete',
+                            //De esta manera obtenemos lo que el buscador esta escribiendo
+                            'term': request.term
+                        },
+                        dataType: 'json',
+                    }).done(function (data) {
+                        // Especificamos que la respuesta es el array de datos obtenido del ajax
+                        response(data);
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        //alert(textStatus + ': ' + errorThrown);
+                    }).always(function (data) {
+                    });
+                },
+                //The delay is needed for reduce the charge of server
+                delay: 500,
+                minLength: 3,
+                // Cuando seleccionamos la palabra se ejecutara esta funcion
+                select: function (event, ui) {
+                    console.log(ui);
+                }
+            });
         })
     </script>
 {% endblock %}

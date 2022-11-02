@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.forms import ModelForm, TextInput, Textarea, forms, Form, ModelChoiceField, Select, DateInput
+from django.forms import ModelForm, TextInput, Textarea, forms, Form, ModelChoiceField, Select, DateInput, CharField
 
 from core.erp.models import Category, Product, Client
 
@@ -167,4 +167,9 @@ class TestForm(Form):
     # Debido a que serán select anidados, el valor del queryset será none
     products = ModelChoiceField(queryset=Product.objects.none(), widget=Select(attrs={
         'class': 'form-control select2'
+    }))
+
+    search = CharField(widget=TextInput(attrs={
+        'class':'form-control',
+        'placeholder':'Ingrese una descripcion'
     }))
