@@ -34,6 +34,10 @@
                     <label>Buscador</label>
                     {{ form.search }}
                 </div>
+                <div class="form-group">
+                    <label>Buscador Select2</label>
+                    {{ form.search2 }}
+                </div>
             </div>
         </div>
     </form>
@@ -125,7 +129,7 @@
                         url: window.location.pathname,
                         type: 'POST',
                         data: {
-                            'action':'autocomplete',
+                            'action': 'autocomplete',
                             //De esta manera obtenemos lo que el buscador esta escribiendo
                             'term': request.term
                         },
@@ -145,6 +149,37 @@
                 select: function (event, ui) {
                     console.log(ui);
                 }
+            });
+
+            //Autocomplete con SELECT 2
+            $('select[name="search2"]').select2({
+                //podemos escoger temas para el select2
+                theme: 'bootstrap4',
+                language: 'es',
+                // Permite borrar la seleccion actual
+                allowClear:true,
+                //https://select2.org/data-sources/ajax
+                ajax: {
+                    delay: 250,
+                    type: 'POST',
+                    url: window.location.pathname,
+                    data: function (params) {
+                        console.log(params);
+                        var queryParameters = {
+                            term: params.term,
+                            action: 'autocomplete2'
+                        }
+                        return queryParameters;
+                    },
+                    //Transformamos los daatos recibidos de la VISTA al formato esperado por SELECT2, similar a DONE()
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
+                    },
+                },
+                placeholder: 'Busca una categoria',
+                minimumInputLength: 1,
             });
         })
     </script>

@@ -24,32 +24,48 @@ class TestView(TemplateView):
         try:
             action = request.POST['action']
             if action == 'search_product_id':
-                #Como el formulario no tiene el primer valor vació, tenemos que iniciarlizarlo de una vez
-                data = [{'id':'', 'text':'-------'}]
+                # Como el formulario no tiene el primer valor vació, tenemos que iniciarlizarlo de una vez
+                data = [{'id': '', 'text': '-------'}]
                 for i in Product.objects.filter(cat_id=request.POST['id']):
                     data.append({'id': i.id, 'text': i.name})
             elif action == 'autocomplete':
                 # data sera un array para devolver un array
-                data=[]
-                #Evitamos mandar todos los registros [0:10] para no sobrecargar el sistema
+                data = []
+                # Evitamos mandar todos los registros [0:10] para no sobrecargar el sistema
                 for i in Category.objects.filter(name__icontains=request.POST['term'])[0:10]:
                     # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete
                     item = i.toJson()
                     item['value'] = i.name
                     data.append(item)
+            elif action == 'autocomplete2':
+                # data sera un array para devolver un array
+                data = []
+                # Evitamos mandar todos los registros [0:10] para no sobrecargar el sistema
+                for i in Category.objects.filter(name__icontains=request.POST['term'])[0:10]:
+                    # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete
+                    item = i.toJson()#ID
+                    """Debe retornar un valor TEXT porque ej SELECT2 se manejan los datos asi
+                        {
+                          "id": 2,
+                          "text": "Option 2"
+                        }
+                    """
+                    item['text'] = i.name #TEXT
+                    data.append(item)
+                    print(data)
             else:
                 data['error'] = 'Ha ocurrido un error'
 
             # data = Category.objects.get(pk=request.POST['id']).toJson()
         except Exception as e:
-            data={}
+            data = {}
             data['error'] = str(e)
-        #Para serializar los elementos que no sean diccionaros, debes establecer safe=False
-        #Ya que estamos enviando una lista de diccionarios, no un diccionario solo
+        # Para serializar los elementos que no sean diccionaros, debes establecer safe=False
+        # Ya que estamos enviando una lista de diccionarios, no un diccionario solo
         return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tile']='Select aninados | Django'
-        context['form']=TestForm()
+        context['tile'] = 'Select aninados | Django'
+        context['form'] = TestForm()
         return context

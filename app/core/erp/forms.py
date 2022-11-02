@@ -173,3 +173,7 @@ class TestForm(Form):
         'class':'form-control',
         'placeholder':'Ingrese una descripcion'
     }))
+
+    search2 = ModelChoiceField(queryset=Product.objects.none(), widget=Select(attrs={
+        'class': 'form-control select2'
+    }))
