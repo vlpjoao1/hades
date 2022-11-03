@@ -4,21 +4,24 @@ from core.erp.views.category.views import category_list, CategoryList, CategoryC
 from core.erp.views.client.views import ClientView
 from core.erp.views.dashborad.views import DashboardView
 from core.erp.views.product.views import ProductList, ProductCreateView, ProductUpdateView, ProductDeleteView
+from core.erp.views.sale.views import SaleCreateView
 from core.erp.views.tests.views import TestView
 
 urlpatterns = [
     path('category/list/', CategoryList.as_view(), name='category_listview'),
-    path('category/Create/', CategoryCreateView.as_view(), name='category_createview'),
+    path('category/create/', CategoryCreateView.as_view(), name='category_createview'),
     path('category/update/<int:pk>/', CategoryUpdateView.as_view(), name='category_updateview'),
     path('category/delete/<int:pk>/', CategoryDeleteView.as_view(), name='category_deleteview'),
     path('category/form/', CategoryFormView.as_view(), name='category_formview'),
     #product
     path('product/list/', ProductList.as_view(), name='product_listview'),
-    path('product/Create/', ProductCreateView.as_view(), name='product_createview'),
+    path('product/create/', ProductCreateView.as_view(), name='product_createview'),
     path('product/update/<int:pk>/', ProductUpdateView.as_view(), name='product_updateview'),
     path('product/delete/<int:pk>/', ProductDeleteView.as_view(), name='product_deleteview'),
     #Client
     path('client/', ClientView.as_view(), name='client_listview'),
+    #Sale
+    path('sale/create/', SaleCreateView.as_view(), name='sale_createview'),
     #dashboard
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     #test

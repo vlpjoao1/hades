@@ -9,8 +9,8 @@
     <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/dataTables.responsive.min.js' %}"></script>
     <script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/responsive.bootstrap4.min.js' %}"></script>
 
+    <!-- Sub HEAD -->
     {% block head_list %}
-
     {% endblock %}
 {% endblock %}
 
@@ -54,7 +54,7 @@
 {% block javascript %}
     <script>
         $(function () {
-            $('#id_table').DataTable({
+            $('#data').DataTable({
                 responsive: true,
                 //Para que no se ajuste el tamaño de las tablas y lo asignemos manual.
                 //Y respete los tamaños puestos en cada th

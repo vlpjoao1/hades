@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.forms import ModelForm, TextInput, Textarea, forms, Form, ModelChoiceField, Select, DateInput, CharField
 
-from core.erp.models import Category, Product, Client
+from core.erp.models import Category, Product, Client, Sale
 
 
 class CategoryForm(ModelForm):
@@ -134,10 +134,10 @@ class ClientForm(ModelForm):
                 }
             ),
             'date_birthday': DateInput(format='%Y-%m-%d',
-                attrs={
-                    'value': datetime.now().strftime('%Y-%m-%d'),
-                }
-            ),
+                                       attrs={
+                                           'value': datetime.now().strftime('%Y-%m-%d'),
+                                       }
+                                       ),
             'address': TextInput(
                 attrs={
                     'placeholder': 'Ingrese su Dirección',
@@ -170,10 +170,38 @@ class TestForm(Form):
     }))
 
     search = CharField(widget=TextInput(attrs={
-        'class':'form-control',
-        'placeholder':'Ingrese una descripcion'
+        'class': 'form-control',
+        'placeholder': 'Ingrese una descripcion'
     }))
 
     search2 = ModelChoiceField(queryset=Product.objects.none(), widget=Select(attrs={
         'class': 'form-control select2'
     }))
+
+
+class SaleForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for form in self.visible_fields():
+            #Debido a que no usaremos el template base de form, que agrega el formcontrol, lo haremos desde aqui
+            form.field.widget.attrs['class'] = 'form-control'
+            form.field.widget.attrs['autocomplete'] = 'off'
+        self.fields['cli'].widget.attrs['autofocus'] = True
+        self.fields['cli'].widget.attrs['class'] = 'form-control select2'
+
+    class Meta:
+        model = Sale
+        fields = '__all__'
+        widgets = {
+            'cli': Select(
+                attrs={
+                    'style': 'width: 100%'
+                }
+            ),
+            'date_joined': DateInput(
+                format='%Y-%m-%d',
+                attrs={
+                    'value': datetime.now().strftime('%Y-%m-%d'),
+                }
+            ),
+        }
