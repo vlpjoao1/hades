@@ -38,6 +38,13 @@ class Category(BaseModel):
     class Meta:
         verbose_name = 'Categoria'
         verbose_name_plural = 'Categorias'
+        #https://docs.djangoproject.com/en/4.1/ref/models/options/
+        """Personalizando permisos
+        permissions=[
+            #codename               #Label
+            ('can_delete_category', 'Can delete Category')
+        ]
+        """
         ordering = ['id']
 
 

@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -7,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
 from core.erp.forms import CategoryForm
-from core.erp.mixins import IsSuperuserMixin
+from core.erp.mixins import IsSuperuserMixin, ValidatePermissionRequiredMixin
 from core.erp.models import Category
 
 
@@ -19,7 +20,8 @@ def category_list(request):
     return render(request, 'category/list.html', data)
 
 
-class CategoryList(IsSuperuserMixin,ListView):
+class CategoryList(ValidatePermissionRequiredMixin  ,ListView):
+    permission_required = 'erp.view_category'
     model = Category
     template_name = 'category/list.html'
 
