@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
 from core.erp.forms import CategoryForm
+from core.erp.mixins import IsSuperuserMixin
 from core.erp.models import Category
 
 
@@ -18,7 +19,7 @@ def category_list(request):
     return render(request, 'category/list.html', data)
 
 
-class CategoryList(ListView):
+class CategoryList(IsSuperuserMixin,ListView):
     model = Category
     template_name = 'category/list.html'
 
