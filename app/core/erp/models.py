@@ -19,7 +19,7 @@ class Category(BaseModel):
     def toJson(self):
         # item = {'id':self.id, 'name':self.name}
         # Con esto convertirmos el resultado en dict, y a model to dict le pasamos la instancia del objeto actual
-        item = model_to_dict(self, exclude=['user_creation','user_updated'])#Podemos excluir valores
+        item = model_to_dict(self)#Podemos excluir valores con exclude=['user_creation','user_updated']
         return item
 
     def save(self, force_insert=False, force_update=False, using=None,
@@ -62,6 +62,13 @@ class Product(models.Model):
             return '{}{}'.format(MEDIA_URL, self.image)
         # imagen por defecto si no se ingresó imagen
         return '{}{}'.format(STATIC_URL, 'img/empty.png')
+
+    def toJson(self):
+        item = model_to_dict(self)
+        item['cat'] = self.cat.toJson()
+        item['image'] = self.get_image()
+        item['pvp'] = format(self.pvp, '.2f')
+        return item
 
     class Meta:
         verbose_name = 'Producto'

@@ -7,10 +7,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
 from core.erp.forms import ProductForm
+from core.erp.mixins import ValidatePermissionRequiredMixin
 from core.erp.models import Product
 
 
-class ProductList(ListView):
+class ProductList(ValidatePermissionRequiredMixin, ListView):
+    permission_required = 'erp.view_product'
     model = Product
     template_name = 'product/list.html'
 
@@ -35,17 +37,21 @@ class ProductList(ListView):
         context['list_url'] = reverse_lazy('erp:product_listview')
         return context
 
+
 """
     Estas vistas se pueden usar solamente poniendo el modelo, el formulario y el template.
     Sobreescribir los métodos, ya es más para personalización.
 """
 
-class ProductCreateView(CreateView):
+
+class ProductCreateView(ValidatePermissionRequiredMixin, CreateView):
+    permission_required = 'erp.add_product'
     model = Product
     form_class = ProductForm
     template_name = 'product/create.html'
     # Reverse_lazy devuelve la cadena de texto de esa url
     success_url = reverse_lazy('erp:product_listview')
+    url_redirect = success_url
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -55,7 +61,7 @@ class ProductCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Crear una producto'
         context['entity'] = 'Categorías'
-        context['list_url'] = reverse_lazy('erp:product_listview')
+        context['list_url'] = self.success_url
         context['action'] = 'add'
         return context
 
@@ -87,11 +93,13 @@ class ProductCreateView(CreateView):
         # return render(request, self.template_name, context)
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(ValidatePermissionRequiredMixin, UpdateView):
+    permission_required = 'erp.update_product'
     model = Product
     form_class = ProductForm
     template_name = 'product/create.html'
     success_url = reverse_lazy('erp:product_listview')
+    url_redirect = success_url
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -115,15 +123,17 @@ class ProductUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Edición de una Producto'
         context['entity'] = 'Productos'
-        context['list_url'] = reverse_lazy('erp:product_listview')
+        context['list_url'] = self.success_url
         context['action'] = 'edit'
         return context
 
 
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(ValidatePermissionRequiredMixin, DeleteView):
+    permission_required = 'erp.delete_product'
     model = Product
     template_name = 'product/delete.html'
     success_url = reverse_lazy('erp:product_listview')
+    url_redirect = success_url
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -145,7 +155,7 @@ class ProductDeleteView(DeleteView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Eliminación de un Producto'
         context['entity'] = 'Productos'
-        context['list_url'] = reverse_lazy('erp:product_listview')
+        context['list_url'] = self.success_url
         context['action'] = 'delete'
         return context
 

@@ -6,10 +6,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
 from core.erp.forms import ClientForm
+from core.erp.mixins import ValidatePermissionRequiredMixin
 from core.erp.models import Client
 
 
-class ClientView(TemplateView):
+class ClientView(ValidatePermissionRequiredMixin,TemplateView):
+    permission_required = 'erp.view_client'
     template_name = 'client/list.html'
 
     @method_decorator(csrf_exempt)

@@ -73,12 +73,12 @@ class CategoryList(ValidatePermissionRequiredMixin  ,ListView):
 
 class CategoryCreateView(ValidatePermissionRequiredMixin,CreateView):
     permission_required = 'erp.add_category'
-    url_redirect = reverse_lazy('erp:category_listview')
     model = Category
     form_class = CategoryForm
     template_name = 'category/create.html'
     # Reverse_lazy devuelve la cadena de texto de esa url
     success_url = reverse_lazy('erp:category_listview')
+    url_redirect = success_url
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -88,7 +88,7 @@ class CategoryCreateView(ValidatePermissionRequiredMixin,CreateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Crear una categoría'
         context['entity'] = 'Categorías'
-        context['list_url'] = reverse_lazy('erp:category_listview')
+        context['list_url'] = self.success_url
         context['action'] = 'add'
         return context
 
@@ -125,11 +125,11 @@ class CategoryCreateView(ValidatePermissionRequiredMixin,CreateView):
 
 class CategoryUpdateView(ValidatePermissionRequiredMixin,UpdateView):
     permission_required = 'erp.change_category'
-    url_redirect = reverse_lazy('erp:category_listview')
     model = Category
     form_class = CategoryForm
     template_name = 'category/create.html'
     success_url = reverse_lazy('erp:category_listview')
+    url_redirect = success_url
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -153,17 +153,17 @@ class CategoryUpdateView(ValidatePermissionRequiredMixin,UpdateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Edición de una Categoria'
         context['entity'] = 'Categorias'
-        context['list_url'] = reverse_lazy('erp:category_listview')
+        context['list_url'] = self.success_url
         context['action'] = 'edit'
         return context
 
 
 class CategoryDeleteView(ValidatePermissionRequiredMixin,DeleteView):
     permission_required = 'erp.delete_category'
-    url_redirect = reverse_lazy('erp:category_listview')
     model = Category
     template_name = 'category/delete.html'
     success_url = reverse_lazy('erp:category_listview')
+    url_redirect = success_url
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -185,7 +185,7 @@ class CategoryDeleteView(ValidatePermissionRequiredMixin,DeleteView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Eliminación de una Categoria'
         context['entity'] = 'Categorias'
-        context['list_url'] = reverse_lazy('erp:category_listview')
+        context['list_url'] = self.success_url
         context['action'] = 'delete'
         return context
 
