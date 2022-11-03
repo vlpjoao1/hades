@@ -71,7 +71,9 @@ class CategoryList(ValidatePermissionRequiredMixin  ,ListView):
 """
 
 
-class CategoryCreateView(CreateView):
+class CategoryCreateView(ValidatePermissionRequiredMixin,CreateView):
+    permission_required = 'erp.add_category'
+    url_redirect = reverse_lazy('erp:category_listview')
     model = Category
     form_class = CategoryForm
     template_name = 'category/create.html'
@@ -121,7 +123,9 @@ class CategoryCreateView(CreateView):
         # return render(request, self.template_name, context)
 
 
-class CategoryUpdateView(UpdateView):
+class CategoryUpdateView(ValidatePermissionRequiredMixin,UpdateView):
+    permission_required = 'erp.change_category'
+    url_redirect = reverse_lazy('erp:category_listview')
     model = Category
     form_class = CategoryForm
     template_name = 'category/create.html'
@@ -154,7 +158,9 @@ class CategoryUpdateView(UpdateView):
         return context
 
 
-class CategoryDeleteView(DeleteView):
+class CategoryDeleteView(ValidatePermissionRequiredMixin,DeleteView):
+    permission_required = 'erp.delete_category'
+    url_redirect = reverse_lazy('erp:category_listview')
     model = Category
     template_name = 'category/delete.html'
     success_url = reverse_lazy('erp:category_listview')
