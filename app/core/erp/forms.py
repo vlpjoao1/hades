@@ -183,25 +183,50 @@ class SaleForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for form in self.visible_fields():
-            #Debido a que no usaremos el template base de form, que agrega el formcontrol, lo haremos desde aqui
+            # Debido a que no usaremos el template base de form, que agrega el formcontrol, lo haremos desde aqui
             form.field.widget.attrs['class'] = 'form-control'
             form.field.widget.attrs['autocomplete'] = 'off'
+        # forma 1
         self.fields['cli'].widget.attrs['autofocus'] = True
         self.fields['cli'].widget.attrs['class'] = 'form-control select2'
+
+        # forma2
+        # self.fields['total'].widget.attrs = {
+        #     'readonly': True,
+        #     'class': 'form-control',
+        # }
 
     class Meta:
         model = Sale
         fields = '__all__'
         widgets = {
-            'cli': Select(
-                attrs={
-                    'style': 'width: 100%'
-                }
-            ),
+            'cli': Select(attrs={
+                'autocomplete': 'off',
+                'autofocus':True
+            }),
+            'subtotal': TextInput(attrs={
+                'readonly': True,
+                'class': 'form-control',
+                'type': 'number'
+            }),
             'date_joined': DateInput(
                 format='%Y-%m-%d',
                 attrs={
                     'value': datetime.now().strftime('%Y-%m-%d'),
+                    'class': 'form-control datetimepicker-input',
+                    'id': 'date_joined',
+                    # referencia al id
+                    'data-target': '#date_joined',
+                    'data-toggle': 'datetimepicker'
                 }
             ),
+            'total': TextInput(attrs={
+                'readonly': True,
+                'class': 'form-control',
+                'type': 'number'
+            }),
+            'iva': TextInput(attrs={
+                'class': 'form-control',
+                'type': 'number'
+            })
         }
