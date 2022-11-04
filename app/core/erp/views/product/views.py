@@ -37,6 +37,21 @@ class ProductList(ValidatePermissionRequiredMixin, ListView):
         context['list_url'] = reverse_lazy('erp:product_listview')
         return context
 
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'searchdata':
+                data = []
+                for i in Product.objects.all():
+                    data.append(i.toJSON())
+            else:
+                data['error'] = 'Ha ocurrido un error'
+        except Exception as e:
+            data = {}
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
+
 
 """
     Estas vistas se pueden usar solamente poniendo el modelo, el formulario y el template.

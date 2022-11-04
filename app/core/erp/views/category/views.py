@@ -53,7 +53,7 @@ class CategoryList(ValidatePermissionRequiredMixin  ,ListView):
             if action == 'searchdata':
                 data=[]
                 for i in Category.objects.all():
-                    data.append(i.toJson())
+                    data.append(i.toJSON())
             else:
                 data['error'] = 'Ha ocurrido un error'
 

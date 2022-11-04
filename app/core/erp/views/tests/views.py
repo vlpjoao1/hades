@@ -34,7 +34,7 @@ class TestView(TemplateView):
                 # Evitamos mandar todos los registros [0:10] para no sobrecargar el sistema
                 for i in Category.objects.filter(name__icontains=request.POST['term'])[0:10]:
                     # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete
-                    item = i.toJson()
+                    item = i.toJSON()
                     item['value'] = i.name
                     data.append(item)
             elif action == 'autocomplete2':
@@ -43,7 +43,7 @@ class TestView(TemplateView):
                 # Evitamos mandar todos los registros [0:10] para no sobrecargar el sistema
                 for i in Category.objects.filter(name__icontains=request.POST['term'])[0:10]:
                     # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete
-                    item = i.toJson()#ID
+                    item = i.toJSON()#ID
                     """Debe retornar un valor TEXT porque ej SELECT2 se manejan los datos asi
                         {
                           "id": 2,

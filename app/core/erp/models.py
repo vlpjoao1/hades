@@ -16,7 +16,7 @@ class Category(BaseModel):
     def __str__(self):
         return 'Nro:{} / Nombre: {}'.format(self.id, self.name)
 
-    def toJson(self):
+    def toJSON(self):
         # item = {'id':self.id, 'name':self.name}
         # Con esto convertirmos el resultado en dict, y a model to dict le pasamos la instancia del objeto actual
         item = model_to_dict(self)#Podemos excluir valores con exclude=['user_creation','user_updated']
@@ -63,9 +63,9 @@ class Product(models.Model):
         # imagen por defecto si no se ingresó imagen
         return '{}{}'.format(STATIC_URL, 'img/empty.png')
 
-    def toJson(self):
+    def toJSON(self):
         item = model_to_dict(self)
-        item['cat'] = self.cat.toJson()
+        item['cat'] = self.cat.toJSON()
         item['image'] = self.get_image()
         item['pvp'] = format(self.pvp, '.2f')
         return item
