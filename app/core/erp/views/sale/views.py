@@ -39,7 +39,7 @@ class SaleCreateView(ValidatePermissionRequiredMixin, CreateView):
             if action == 'search_products':
                 data = []
                 # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
-                prods = Product.objects.filter(name__icontains=request.POST['term'])
+                prods = Product.objects.filter(name__icontains=request.POST['term'])[0:10]
                 for i in prods:
                     item = i.toJSON()  # retornamos el item
                     # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete en el SELECT

@@ -9,13 +9,45 @@ var vents = {
         //los productos
         products: []
     },
+    //Calcular factura
+    calculate_invoice: function () {
+        // Con esta variable iremos obteniendo la suma de todos los productos
+        var subtotal = 0.00;
+        //obtenemos el % del iva
+        var iva = $('input[name="iva"]').val()
+
+        //Si iteramos una lista, obtendremos el index y value, que en este caso sera la POS y el DICT
+        $.each(this.items.products, function (pos, dict) {
+            //Multiplicamos la cantidadd de productos por el precio, lo que nos da el total
+            dict.subtotal = dict.cant * parseFloat(dict.pvp);
+            subtotal += dict.subtotal;
+        });//Calculamos el subtotal de cada producto
+
+        this.items.subtotal = subtotal;
+        //Calculamos el IVA
+        this.items.iva = (this.items.subtotal * iva) / 100;
+        this.items.total = this.items.subtotal + this.items.iva;
+
+        //Seteamos en el formulario subtotal
+        $('input[name="subtotal"]').val(this.items.subtotal.toFixed(2));
+        $('input[name="ivacalc"]').val(this.items.iva.toFixed(2));
+        $('input[name="total"]').val(this.items.total.toFixed(2));
+
+        console.log(subtotal)
+    },
     add: function (item) {
         //Agregamos el item a la variable products
         this.items.products.push(item);
         //listamos el item en la tabla
         this.list();
     },
+    /*
+    * Debido a que los productos del items se van creciendo, cada vez que ejecutas el LIST este destruye la tabla
+    * y le agrega los valores del los items en la data
+    * */
     list: function () {
+        //Calculamos la factura al listar
+        this.calculate_invoice();
         $('#tblProducts').dataTable({
             responsive: true,
             autoWidth: false,
@@ -80,20 +112,23 @@ $(function () {
         locale: 'es',
         maxDate: moment().format('YYYY-MM-DD')
     });
-    //TouchSpin
+
+    //TouchSpin https://www.virtuosoft.eu/code/bootstrap-touchspin/
     $("input[name='iva']").TouchSpin({
         min: 0,
         max: 100,
-        step: 0.1,
+        step: 1,
         decimals: 2,
         boostat: 5,
         maxboostedstep: 10,
         postfix: '%'
-    });
+    }).on('change', function () {
+        //Recalcular factura al cambiar el IVA
+        vents.calculate_invoice();
+    }).val(12);
 
     //Search Products
     $('input[name="search"]').autocomplete({
-        //source: availableTags,
         //Opciones que se van a mostrar.
         source: function (request, response) {
             $.ajax({
