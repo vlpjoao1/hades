@@ -1,6 +1,9 @@
 {% extends 'list.html' %}
 {% load static %}
 {% block head_list %}
+    {# JQUERY UI AUTOCOMPLETE #}
+    <link rel="stylesheet" href="{% static 'lib/jquery-ui-1.13.2/jquery-ui.min.css' %}">
+    <script src="{% static 'lib/jquery-ui-1.13.2/jquery-ui.min.js' %}"></script>
     {#  SELECT2  #}
     <link rel="stylesheet" href="{% static 'lib/select2-4.0.13/css/select2.min.css' %}">
     {# Para poder cargar el tema de bootstrap #}
@@ -14,7 +17,8 @@
     <link rel="stylesheet" href="{% static 'lib/tempusdominus-bootstrap-4/tempusdominus-bootstrap-4.min.css' %}">
     {# TOUCHSPIN   #}
     <link rel="stylesheet" href="{% static 'lib/bootstrap-touchspin-4.3.0/jquery.bootstrap-touchspin.css' %}">
-    <script src="{% static 'lib/bootstrap-touchspin-4.3.0/jquery.bootstrap-touchspin.js' %}"></script> {# Moment + Idiiomas #}
+    <script src="{% static 'lib/bootstrap-touchspin-4.3.0/jquery.bootstrap-touchspin.js' %}"></script>
+    {# Moment + Idiiomas #}
     {# STYLES   #}
     <script src="{% static 'sale/js/form.js' %}"></script>
 {% endblock %}
@@ -44,7 +48,8 @@
                             <div class="form-group">
                                 <label>Buscador de productos:</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control"
+                                    <!-- Search input with AUTOCOMPLETE -->
+                                    <input type="text" class="form-control" name="search"
                                            placeholder="Ingrese una descripcion de producto" autocomplete="off">
                                     <span class="input-group-append">
                                         <button type="button" class="btn btn-danger btn-flat">
@@ -55,7 +60,7 @@
                             </div>
                             <!-- Divisor -->
                             <hr>
-                            <table class="table table-bordered" id="data">
+                            <table class="table table-bordered" id="tblProducts">
                                 <thead>
                                 <tr>
                                     <th>Eliminar</th>

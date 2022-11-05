@@ -2,14 +2,15 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView
 
 from core.erp.forms import SaleForm
 from core.erp.mixins import ValidatePermissionRequiredMixin
-from core.erp.models import Sale
+from core.erp.models import Sale, Product
 
 
-class SaleCreateView(ValidatePermissionRequiredMixin,CreateView):
+class SaleCreateView(ValidatePermissionRequiredMixin, CreateView):
     permission_required = 'erp.add_sale'
     model = Sale
     form_class = SaleForm
@@ -19,6 +20,7 @@ class SaleCreateView(ValidatePermissionRequiredMixin,CreateView):
     url_redirect = success_url
 
     @method_decorator(login_required)
+    @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
@@ -34,18 +36,21 @@ class SaleCreateView(ValidatePermissionRequiredMixin,CreateView):
         data = {}
         try:
             action = request.POST['action']
-            if action == 'add':
-                form = self.form_class(request.POST)
-                data = form.save()
-                # if form.is_valid():
-                #     form.save()
-                # else:
-                #     data['error'] = form.errors
+            if action == 'search_products':
+                data = []
+                # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
+                prods = Product.objects.filter(name__icontains=request.POST['term'])
+                for i in prods:
+                    item = i.toJSON()  # retornamos el item
+                    # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete en el SELECT
+                    item['value'] = i.name  # retornamos el nombre del item
+                    data.append(item)
             else:
                 data['error'] = 'No ha ingresado ninguna opción'
         except Exception as e:
             data['error'] = str(e)
-        return JsonResponse(data)
+        # Para que se serialize cuando sea una serie de elementos.
+        return JsonResponse(data, safe=False)
 
         """Este codigo sería para retornar los errores sin ajax"""
         # form = self.form_class(request.POST)
