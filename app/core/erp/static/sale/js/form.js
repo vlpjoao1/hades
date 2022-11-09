@@ -1,3 +1,4 @@
+var tblProducts;
 var vents = {
     //Datos de la cabecera (Sale)
     items: {
@@ -14,7 +15,7 @@ var vents = {
         // Con esta variable iremos obteniendo la suma de todos los productos
         var subtotal = 0.00;
         //obtenemos el % del iva
-        var iva = $('input[name="iva"]').val()
+        var iva = $('input[name="iva"]').val();
 
         //Si iteramos una lista, obtendremos el index y value, que en este caso sera la POS y el DICT
         $.each(this.items.products, function (pos, dict) {
@@ -32,8 +33,6 @@ var vents = {
         $('input[name="subtotal"]').val(this.items.subtotal.toFixed(2));
         $('input[name="ivacalc"]').val(this.items.iva.toFixed(2));
         $('input[name="total"]').val(this.items.total.toFixed(2));
-
-        console.log(subtotal)
     },
     add: function (item) {
         //Agregamos el item a la variable products
@@ -48,7 +47,8 @@ var vents = {
     list: function () {
         //Calculamos la factura al listar
         this.calculate_invoice();
-        $('#tblProducts').dataTable({
+        //Asignamos el datatable a la variable
+        tblProducts = $('#tblProducts').DataTable({
             responsive: true,
             autoWidth: false,
             destroy: true,
@@ -89,10 +89,28 @@ var vents = {
                     class: 'tex-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<input type="text" name="cantidad" class="form-control form-control-sm" autocomplete="off" value="' + data + '">';
+                        return '<input type="text" name="cantidad" class="form-control form-control-sm input-sm" autocomplete="off" value="' + data + '">';
                     }
                 },
             ],
+            //https://datatables.net/reference/option/rowCallback
+            //A medida que se vayan creando registro de la tabla, puedo ir modificando registros de la tabla.
+            rowCallback(row, data, displayNum, displayIndex, dataIndex) {
+                /* Explicacion:
+                *  rowCallback se ejecuta antes de renderizar el dato en pantalla, esto nos permite modificarlo antes de
+                * mostrarlo. esto te devueelve la fila, los datos y algo mas
+                * */
+                // En el row buscamos el input llamado cantidad y le agregamos el touchspin
+                $(row).find('input[name="cantidad"]').TouchSpin({
+                    min: 0,
+                    max: 100000000,
+                    step: 1,
+                }).on('change', function () {
+                    //Recalcular factura al cambiar el IVA
+                    vents.calculate_invoice();
+                });
+
+            },
             //se ejecuta cuando ya se cargue la tabla
             initComplete: function (settings, jsong) {
             }
@@ -105,7 +123,6 @@ $(function () {
         theme: 'bootstrap4',
         language: 'es'
     });
-
     $('#date_joined').datetimepicker({
         format: 'YYYY-MM-DD',
         date: moment().format('YYYY-MM-DD'),
@@ -114,6 +131,7 @@ $(function () {
     });
 
     //TouchSpin https://www.virtuosoft.eu/code/bootstrap-touchspin/
+    // IVA porcentaje
     $("input[name='iva']").TouchSpin({
         min: 0,
         max: 100,
@@ -162,5 +180,27 @@ $(function () {
             //Limpiamos el formulario de busqueda para escoger otro producto.
             $(this).val('');
         }
+    });
+
+    // Evento cantidad formulario
+    // Usamos keyup porque cuando usamos solo CHANGE tenemos que quitar el focus del form para que se ejecute el script
+    $('#tblProducts tbody').on('change', 'input[name="cantidad"]', function () {
+        //obtenemos la cantidad
+        var cant = parseInt($(this).val());
+
+        // Obtenemos la posición de la celda donde esta ubicada la instancia actual.
+        var tr = tblProducts.cell($(this).closest('td, li')).index();
+
+        //Actualizamos el producto con la nueva cantidad obtenida del formulario
+        vents.items.products[tr.row].cant = cant;
+
+        //recalculamos la factura
+        vents.calculate_invoice();
+        //td:eq(n) hace referencia a la posicion del td dentro del row.
+        //https://datatables.net/reference/api/row().node()
+        //Obtenemos la columna que vamos a modificar y luego le modificamos el html con html()
+        $('td:eq(5)', tblProducts.row(tr.row).node()).html('$'+vents.items.products[tr.row].subtotal.toFixed(2));
+        console.log(vents.items.products);
+
     });
 });
