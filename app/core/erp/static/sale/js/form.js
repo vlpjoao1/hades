@@ -230,4 +230,42 @@ $(function () {
             console.log(vents.items.products);
 
         });
+
+    //Clean form os search
+    $('.btnClearSearch').on('click',function (){
+        $('input[name="search"]').val('').focus();
+    });
+
+    //event submit
+    $('#form_sale').on('submit', function (e) {
+        e.preventDefault();
+        if(vents.items.products.length === 0){
+            message_error('Debe haber al menos tener 1 item en su detalle de venta');
+            //Terminamos el proceso en el false
+            return false;
+        }
+        //Seteamos el datejoined y el cliente a la variable vents
+        vents.items.date_joined = $('input[name="date_joined"]').val();
+        vents.items.cli = $('select[name="cli"]').val();
+        /*
+        Dejamos el formdata vacio y le agregamos los datos manualmente, ya que no enviaremos el formulario como tal
+        sino la variable vents con sus datos.
+        */
+        var parameters = new FormData();
+
+        parameters.append('action', $('input[name="action"]').val());
+        //https://www.w3schools.com/js/js_json_stringify.asp
+        //convertimos el dict ITEMS en un STRING
+        parameters.append('vents', JSON.stringify(vents.items)); //Lo convertimos en un string
+        /*
+        Al enviar un dict por un formdata, este se envia como un STR, pero usamos el stringfy por si pasa algo inusual
+        */
+
+        submit_with_ajax(window.location.pathname, 'Notificacion', '¿Estás seguro de realizar la siguiente acción?', parameters,
+            function () {
+                location.href = '/erp/dashboard/'
+            });
+    });
+    //Lo llamamos para que se le active el datatable a la tabla ya que no se activaba al menos que se agregara un item
+    vents.list();
 });

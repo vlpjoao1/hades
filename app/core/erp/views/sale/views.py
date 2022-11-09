@@ -1,13 +1,15 @@
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView
+import json
 
 from core.erp.forms import SaleForm
 from core.erp.mixins import ValidatePermissionRequiredMixin
-from core.erp.models import Sale, Product
+from core.erp.models import Sale, Product, DetSale
 
 
 class SaleCreateView(ValidatePermissionRequiredMixin, CreateView):
@@ -45,6 +47,30 @@ class SaleCreateView(ValidatePermissionRequiredMixin, CreateView):
                     # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete en el SELECT
                     item['value'] = i.name  # retornamos el nombre del item
                     data.append(item)
+            elif action == 'add':
+                """
+                    Al recibir los datos, estamos enviando un dict, pero ese dict se convierte en un str, por eso debemos convertirlo en un dict de vuelta
+                """
+                with transaction.atomic(): #Revertimos las creaciones si hay algun error en el lote de creacion
+                    vents = json.loads(request.POST['vents'])
+                    sale = Sale()
+                    sale.date_joined = vents['date_joined']
+                    #Cuando hacemos referncia a una FK ponemos _id para la relacion (por convencion)
+                    sale.cli_id = vents['cli']
+                    sale.subtotal = float(vents['subtotal'])
+                    sale.iva = float(vents['iva'])
+                    sale.total = float(vents['total'])
+                    sale.save()
+                    #Registramos los productos, asociamos la venta
+                    for i in vents['products']:
+                        det = DetSale()
+                        det.sale_id = sale.id
+                        det.prod_id = i['id']
+                        det.cant = int(i['cant'])
+                        #precio de venta
+                        det.price = float(i['pvp'])
+                        det.subtotal = float(i['subtotal'])
+                        det.save()
             else:
                 data['error'] = 'No ha ingresado ninguna opción'
         except Exception as e:
