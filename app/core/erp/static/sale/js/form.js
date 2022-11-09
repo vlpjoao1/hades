@@ -72,7 +72,7 @@ var vents = {
                     class: 'tex-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<a rel="remove" type="button" class="btn btn-danger btn-xs btn-flat"><i class="fas fa-trash-alt"></i></a>';
+                        return '<a rel="remove" type="button" class="btn btn-danger btn-xs btn-flat" style="color:white;"><i class="fas fa-trash-alt"></i></a>';
                     }
                 },
                 {
@@ -182,25 +182,52 @@ $(function () {
         }
     });
 
+    $('.btnRemoveAll').on('click', function () {
+        // si no hay productos, muere el proceso ahi
+        if (vents.items.products.length === 0) return false;
+        alert_action('Notificacion!', '¿Estás seguro de eliminar todos los registros de la tabla?',
+            function () {
+                //vaciamos los productos
+                vents.items.products = [];
+                vents.list();
+            });
+    });
+
     // Evento cantidad formulario
     // Usamos keyup porque cuando usamos solo CHANGE tenemos que quitar el focus del form para que se ejecute el script
-    $('#tblProducts tbody').on('change', 'input[name="cantidad"]', function () {
-        //obtenemos la cantidad
-        var cant = parseInt($(this).val());
+    $('#tblProducts tbody')
+        //cuando eliminamos
+        .on('click', 'a[rel="remove"]', function () {
+            var tr = tblProducts.cell($(this).closest('td, li')).index();
+            alert_action('Notificacion!', '¿Estás seguro de eliminar este producto de tu detalle?',
+                function () {
+                    //Obtenemos la posicion del valor dentro de la tabla
+                    // eliminamos el producto del array le pasamos la posicion
+                    // https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Array
+                    vents.items.products.splice(tr.row, 1);// (desde, cantidad a eliminar)
 
-        // Obtenemos la posición de la celda donde esta ubicada la instancia actual.
-        var tr = tblProducts.cell($(this).closest('td, li')).index();
+                    //refrescamos listado
+                    vents.list();
+                });
+        })
+        //Cuando cambia cantidad
+        .on('change', 'input[name="cantidad"]', function () {
+            //obtenemos la cantidad
+            var cant = parseInt($(this).val());
 
-        //Actualizamos el producto con la nueva cantidad obtenida del formulario
-        vents.items.products[tr.row].cant = cant;
+            // Obtenemos la posición de la celda donde esta ubicada la instancia actual.
+            var tr = tblProducts.cell($(this).closest('td, li')).index();
 
-        //recalculamos la factura
-        vents.calculate_invoice();
-        //td:eq(n) hace referencia a la posicion del td dentro del row.
-        //https://datatables.net/reference/api/row().node()
-        //Obtenemos la columna que vamos a modificar y luego le modificamos el html con html()
-        $('td:eq(5)', tblProducts.row(tr.row).node()).html('$'+vents.items.products[tr.row].subtotal.toFixed(2));
-        console.log(vents.items.products);
+            //Actualizamos el producto con la nueva cantidad obtenida del formulario
+            vents.items.products[tr.row].cant = cant;
 
-    });
+            //recalculamos la factura
+            vents.calculate_invoice();
+            //td:eq(n) hace referencia a la posicion del td dentro del row.
+            //https://datatables.net/reference/api/row().node()
+            //Obtenemos la columna que vamos a modificar y luego le modificamos el html con html()
+            $('td:eq(5)', tblProducts.row(tr.row).node()).html('$' + vents.items.products[tr.row].subtotal.toFixed(2));
+            console.log(vents.items.products);
+
+        });
 });
