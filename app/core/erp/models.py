@@ -19,7 +19,7 @@ class Category(BaseModel):
     def toJSON(self):
         # item = {'id':self.id, 'name':self.name}
         # Con esto convertirmos el resultado en dict, y a model to dict le pasamos la instancia del objeto actual
-        item = model_to_dict(self)#Podemos excluir valores con exclude=['user_creation','user_updated']
+        item = model_to_dict(self)  # Podemos excluir valores con exclude=['user_creation','user_updated']
         return item
 
     def save(self, force_insert=False, force_update=False, using=None,
@@ -38,7 +38,7 @@ class Category(BaseModel):
     class Meta:
         verbose_name = 'Categoria'
         verbose_name_plural = 'Categorias'
-        #https://docs.djangoproject.com/en/4.1/ref/models/options/
+        # https://docs.djangoproject.com/en/4.1/ref/models/options/
         """Personalizando permisos
         permissions=[
             #codename               #Label
@@ -89,10 +89,10 @@ class Client(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
-        #https: // dustindavis.me / blog / django - tip - get_field_display / Se usa para los choices
-        #lo pasamos con ID y su genero para diferenciarlo por su ID
-        item['gender'] = {'id':self.gender, 'name':self.get_gender_display()}
-        #formateo el date_birthday
+        # https: // dustindavis.me / blog / django - tip - get_field_display / Se usa para los choices
+        # lo pasamos con ID y su genero para diferenciarlo por su ID
+        item['gender'] = {'id': self.gender, 'name': self.get_gender_display()}
+        # formateo el date_birthday
         item['date_birthday'] = self.date_birthday.strftime('%Y-%m-%d')
         return item
 
@@ -112,6 +112,24 @@ class Sale(models.Model):
     def __str__(self):
         return self.cli.names
 
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['cli'] = self.cli.toJSON()
+        item['subtotal'] = format(self.subtotal, '.2f')
+        item['iva'] = format(self.iva, '.2f')
+        item['total'] = format(self.total, '.2f')
+        item['date_joined'] = self.date_joined.strftime('%Y-%m-%d')
+        """
+        _set obtiene la relacion inversa de un modelo.
+        Como esta Venta esta asociada a un detalle, pero desde la venta no hay
+        una relacion directa a detalle sino de detalle a venta, con _set podemos obtener
+        esos detalles asociados a esta venta.
+        """
+        #Si escribimos self.set deben salirnos todas las relaciones inversas
+        item['det'] = [i.toJSON() for i in self.detsale_set.all()]
+        # Equivale a esto = DeSale.objects.filter(sale_id=self.id)
+        return item
+
     class Meta:
         verbose_name = 'Venta'
         verbose_name_plural = 'Ventas'
@@ -127,6 +145,15 @@ class DetSale(models.Model):
 
     def __str__(self):
         return self.prod.name
+
+    def toJSON(self):
+        #Excluimos la venta ya que no necsitamos la relacion
+        item = model_to_dict(self, exclude=['sale'])
+        item['prod'] = self.prod.toJSON()
+        #Lo formateamos a float porque el valor decimal por default, da error al convertirse a JSON
+        item['price'] = format(self.price, '.2f')
+        item['subtotal'] = format(self.subtotal, '.2f')
+        return item
 
     class Meta:
         verbose_name = 'Detalle de Venta'
