@@ -227,6 +227,6 @@ class SaleForm(ModelForm):
             }),
             'iva': TextInput(attrs={
                 'class': 'form-control',
-                'type': 'number'
+                'type': 'text'
             })
         }

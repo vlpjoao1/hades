@@ -131,4 +131,9 @@
             </div>
         </form>
     </div>
+    <script>
+        vents.items.products = {{ det|safe }};
+        vents.list();
+        console.log({{ det|safe }});
+    </script>
 {% endblock %}

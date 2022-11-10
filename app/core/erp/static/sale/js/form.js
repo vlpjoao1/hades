@@ -45,6 +45,7 @@ var vents = {
     * y le agrega los valores del los items en la data
     * */
     list: function () {
+         console.log(this.items);
         //Calculamos la factura al listar
         this.calculate_invoice();
         //Asignamos el datatable a la variable
@@ -211,7 +212,7 @@ $(function () {
                 });
         })
         //Cuando cambia cantidad
-        .on('change', 'input[name="cantidad"]', function () {
+        .on('change keyup', 'input[name="cantidad"]', function () {
             //obtenemos la cantidad
             var cant = parseInt($(this).val());
 
@@ -267,5 +268,5 @@ $(function () {
             });
     });
     //Lo llamamos para que se le active el datatable a la tabla ya que no se activaba al menos que se agregara un item
-    vents.list();
+    //vents.list();
 });
