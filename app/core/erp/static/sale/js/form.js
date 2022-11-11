@@ -330,7 +330,7 @@ $(function () {
 
         submit_with_ajax(window.location.pathname, 'Notificacion', '¿Estás seguro de realizar la siguiente acción?', parameters,
             function () {
-                location.href = '/erp/dashboard/'
+                location.href = '/erp/sale/list/'
             });
     });
     //Lo llamamos para que se le active el datatable a la tabla ya que no se activaba al menos que se agregara un item

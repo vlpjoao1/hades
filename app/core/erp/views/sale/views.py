@@ -1,16 +1,23 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import CreateView, ListView, DeleteView, UpdateView
+from django.views.generic import CreateView, ListView, DeleteView, UpdateView, View
 import json
 
 from core.erp.forms import SaleForm
 from core.erp.mixins import ValidatePermissionRequiredMixin
 from core.erp.models import Sale, Product, DetSale
+
+# xhtmlpdf
+import os
+from django.conf import settings
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.contrib.staticfiles import finders
 
 
 class SaleListView(LoginRequiredMixin, ValidatePermissionRequiredMixin, ListView):
@@ -70,7 +77,7 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
         context['entity'] = 'Ventas'
         context['list_url'] = self.success_url
         context['action'] = 'add'
-        #Ya que en el updateview creamos esa variable, aqui la mandamos vacia
+        # Ya que en el updateview creamos esa variable, aqui la mandamos vacia
         context['det'] = []
         return context
 
@@ -86,7 +93,7 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                     item = i.toJSON()  # retornamos el item
                     # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete en el SELECT
                     item['value'] = i.name  # retornamos el nombre del item
-                    #Usamos text para select2 y value para autocomplete
+                    # Usamos text para select2 y value para autocomplete
                     item['text'] = i.name  # retornamos el nombre del item
                     data.append(item)
             elif action == 'add':
@@ -168,8 +175,8 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
                 """
                 with transaction.atomic():  # Revertimos las creaciones si hay algun error en el lote de creacion
                     vents = json.loads(request.POST['vents'])
-                    #Aqui solo debemos consultar el objeto y lo modificamos
-                    #sale = Sale.objects.get(pk=self.get_object().pk)
+                    # Aqui solo debemos consultar el objeto y lo modificamos
+                    # sale = Sale.objects.get(pk=self.get_object().pk)
                     sale = self.get_object()
                     sale.date_joined = vents['date_joined']
                     # Cuando hacemos referncia a una FK ponemos _id para la relacion (por convencion)
@@ -178,7 +185,7 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
                     sale.iva = float(vents['iva'])
                     sale.total = float(vents['total'])
                     sale.save()
-                    #Por facilidad eliminamos todos los productos y los volvemos a crear.
+                    # Por facilidad eliminamos todos los productos y los volvemos a crear.
                     sale.detsale_set.all().delete()
                     # Registramos los productos, asociamos la venta
                     for i in vents['products']:
@@ -238,7 +245,7 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
         """ Ya que obtuvimos una lista de diccionarios, esto va a convertir cada diccionario en un valor de diccionario
         pasara de ser una lista a un diccionario de diccionarios 
         """
-        context['det'] = json.dumps(self.get_details_products()) #Lo convertimos a json pq eso necesitamos en JS
+        context['det'] = json.dumps(self.get_details_products())  # Lo convertimos a json pq eso necesitamos en JS
         return context
 
 
@@ -267,3 +274,29 @@ class SaleDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Delete
         context['entity'] = 'Ventas'
         context['list_url'] = self.success_url
         return context
+
+
+class SaleInvoicePdfView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        try:
+            # Instanciamos el template con get_template y podremos acceder a los metodos de los datos tipo template
+            template = get_template('sale/invoice.html')
+            context = {'title': 'Mi primer pdf'}
+            # Create a Django response object, and specify content_type as pdf
+            response = HttpResponse(content_type='application/pdf')  # Se va a descargar
+            response['Content-Disposition'] = 'attachment; filename="report.pdf"'  # Va a tener este nombre
+            # https://docs.djangoproject.com/en/3.0/topics/templates/
+            # find the template and render it
+            html = template.render(context=context)
+
+            # create a pdf
+            """Pasamos 2 parametros:
+            html: la ruta del objeto que se va a convertir
+            dest: Cual va a ser el objeto que va a contener la conversion"""
+            pisa_status = pisa.CreatePDF(
+                html, dest=response)
+            return response
+        except:
+            pass
+        return HttpResponseRedirect(reverse_lazy('erp:sale_listview'))
