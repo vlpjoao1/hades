@@ -120,6 +120,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = '/static/'
+"""Cuando ejecutamos COLLECTSTATIC para poner todos los archivos
+estaticos en una sola carpetatenemos que definir a que carpeta iran esos archivos en STATIC_ROOT"""
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/') #BASE_DIR obtencion de la ruta del directorio
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]

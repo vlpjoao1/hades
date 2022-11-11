@@ -277,26 +277,63 @@ class SaleDeleteView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Delete
 
 
 class SaleInvoicePdfView(LoginRequiredMixin, View):
+    # Esto lo usaremos para trabajar con archivos estaticos
+    def link_callback(self, uri, rel):
+        """
+        Convert HTML URIs to absolute system paths so xhtml2pdf can access those
+        resources
+        """
+        result = finders.find(uri)
+        if result:
+            if not isinstance(result, (list, tuple)):
+                result = [result]
+            result = list(os.path.realpath(path) for path in result)
+            path = result[0]
+        else:
+            sUrl = settings.STATIC_URL  # Typically /static/
+            sRoot = settings.STATIC_ROOT  # Typically /home/userX/project_static/
+            mUrl = settings.MEDIA_URL  # Typically /media/
+            mRoot = settings.MEDIA_ROOT  # Typically /home/userX/project_static/media/
+
+            if uri.startswith(mUrl):
+                path = os.path.join(mRoot, uri.replace(mUrl, ""))
+            elif uri.startswith(sUrl):
+                path = os.path.join(sRoot, uri.replace(sUrl, ""))
+            else:
+                return uri
+
+        # make sure that file exists
+        if not os.path.isfile(path):
+            raise Exception(
+                'media URI must start with %s or %s' % (sUrl, mUrl)
+            )
+        return path
 
     def get(self, request, *args, **kwargs):
-        try:
-            # Instanciamos el template con get_template y podremos acceder a los metodos de los datos tipo template
-            template = get_template('sale/invoice.html')
-            context = {'title': 'Mi primer pdf'}
-            # Create a Django response object, and specify content_type as pdf
-            response = HttpResponse(content_type='application/pdf')  # Se va a descargar
-            response['Content-Disposition'] = 'attachment; filename="report.pdf"'  # Va a tener este nombre
-            # https://docs.djangoproject.com/en/3.0/topics/templates/
-            # find the template and render it
-            html = template.render(context=context)
+        # Instanciamos el template con get_template y podremos acceder a los metodos de los datos tipo template
+        template = get_template('sale/invoice.html')
+        context = {
+            'sale': Sale.objects.get(pk=self.kwargs['pk']),
+            'comp': {
+                'name': 'Joao.INC',
+                'ruc': '999999999',
+                'address': 'Carlos Perez'
+            },
+            #debido a que no funcionaba con (settings.STATIC_URL,'img') lo hice asi
+            'icon':'{}{}'.format(settings.BASE_DIR, '/static/img/logo.png')
+        }
+        # Create a Django response object, and specify content_type as pdf
+        response = HttpResponse(content_type='application/pdf')  # Se va a descargar
+        #si no usamos esto no se descarga.
+        response['Content-Disposition'] = 'attachment; filename="report.pdf"'  # Va a tener este nombre
+        # https://docs.djangoproject.com/en/3.0/topics/templates/
+        # find the template and render it
+        html = template.render(context=context)
 
-            # create a pdf
-            """Pasamos 2 parametros:
-            html: la ruta del objeto que se va a convertir
-            dest: Cual va a ser el objeto que va a contener la conversion"""
-            pisa_status = pisa.CreatePDF(
-                html, dest=response)
-            return response
-        except:
-            pass
-        return HttpResponseRedirect(reverse_lazy('erp:sale_listview'))
+        # create a pdf
+        """Pasamos 2 parametros:
+        html: la ruta del objeto que se va a convertir
+        dest: Cual va a ser el objeto que va a contener la conversion"""
+        pisa_status = pisa.CreatePDF(html, dest=response, link_callback=self.link_callback)
+        # con linkcalback pasamos la configuracion para los archivos ESTATICOS
+        return response
