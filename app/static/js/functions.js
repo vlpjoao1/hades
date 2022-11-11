@@ -21,7 +21,7 @@ function message_error(obj) {
 };
 
 //https://craftpip.github.io/jquery-confirm/
-function submit_with_ajax(url,title,content, parameters, callback) {
+function submit_with_ajax(url, title, content, parameters, callback) {
     $.confirm({
         theme: 'material',
         title: title,
@@ -43,14 +43,15 @@ function submit_with_ajax(url,title,content, parameters, callback) {
                         data: parameters,
                         dataType: 'json',
                         /* Esto se agrega al momento de enviar FILES en el formulario */
-                            //Para que los datos enviados se transformen en un string
-                            processData: false,
-                            //Que no configure el tipo de dato recibido del servidor
-                            contentType: false,
+                        //Para que los datos enviados se transformen en un string
+                        processData: false,
+                        //Que no configure el tipo de dato recibido del servidor
+                        contentType: false,
                     }).done(function (data) {
-                        console.log(data);
+                        console.log(data,'Functions.js');
                         if (!data.hasOwnProperty('error')) {
-                            callback();
+                            // Le enviamos los datos del ajax a la funcion para poder obtener el ID
+                            callback(data);
                             return false;
                         }
                         message_error(data.error);
@@ -73,7 +74,7 @@ function submit_with_ajax(url,title,content, parameters, callback) {
 };
 
 // Funcion para confirmar una accion
-function alert_action(title,content, callback) {
+function alert_action(title, content, callback, cancel) {
     $.confirm({
         theme: 'material',
         title: title,
@@ -96,7 +97,7 @@ function alert_action(title,content, callback) {
                 text: "No",
                 btnClass: 'btn-red',
                 action: function () {
-
+                    cancel();
                 }
             },
         }

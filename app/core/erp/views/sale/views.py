@@ -120,6 +120,8 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                         det.price = float(i['pvp'])
                         det.subtotal = float(i['subtotal'])
                         det.save()
+                    #Enviamos el ID en el response para manejarlo en el ajax y poder generar la factura
+                    data = {'id':sale.id}
             else:
                 data['error'] = 'No ha ingresado ninguna opción'
         except Exception as e:
@@ -197,6 +199,7 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
                         det.price = float(i['pvp'])
                         det.subtotal = float(i['subtotal'])
                         det.save()
+                    data = {'id': sale.id}
             else:
                 data['error'] = 'No ha ingresado ninguna opción'
         except Exception as e:
@@ -325,7 +328,7 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
         # Create a Django response object, and specify content_type as pdf
         response = HttpResponse(content_type='application/pdf')  # Se va a descargar
         #si no usamos esto no se descarga.
-        response['Content-Disposition'] = 'attachment; filename="report.pdf"'  # Va a tener este nombre
+        #response['Content-Disposition'] = 'attachment; filename="report.pdf"'  # Va a tener este nombre
         # https://docs.djangoproject.com/en/3.0/topics/templates/
         # find the template and render it
         html = template.render(context=context)

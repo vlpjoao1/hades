@@ -257,6 +257,7 @@ $(function () {
                 //vaciamos los productos
                 vents.items.products = [];
                 vents.list();
+            }, function () {
             });
     });
 
@@ -275,6 +276,7 @@ $(function () {
 
                     //refrescamos listado
                     vents.list();
+                }, function () {
                 });
         })
         //Cuando cambia cantidad
@@ -328,9 +330,16 @@ $(function () {
         Al enviar un dict por un formdata, este se envia como un STR, pero usamos el stringfy por si pasa algo inusual
         */
 
-        submit_with_ajax(window.location.pathname, 'Notificacion', '¿Estás seguro de realizar la siguiente acción?', parameters,
-            function () {
-                location.href = '/erp/sale/list/'
+        submit_with_ajax(window.location.pathname, 'Notificacion',
+            '¿Estás seguro de realizar la siguiente acción?', parameters, function (response) {
+                alert_action('Notificacion!', '¿Desea imprimir la boleta de venta?', function () {
+                    // Que lo abra en una pestana nueva
+                    window.open('/erp/sale/invoice/pdf/' + response.id + '/', '_blank');
+                    // Que redireccione al listado
+                    location.href = '/erp/sale/list/';
+                }, function () {
+                    location.href = '/erp/sale/list/';
+                });
             });
     });
     //Lo llamamos para que se le active el datatable a la tabla ya que no se activaba al menos que se agregara un item
