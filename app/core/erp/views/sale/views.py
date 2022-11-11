@@ -86,6 +86,8 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                     item = i.toJSON()  # retornamos el item
                     # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete en el SELECT
                     item['value'] = i.name  # retornamos el nombre del item
+                    #Usamos text para select2 y value para autocomplete
+                    item['text'] = i.name  # retornamos el nombre del item
                     data.append(item)
             elif action == 'add':
                 """

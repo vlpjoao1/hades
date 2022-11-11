@@ -45,7 +45,7 @@ var vents = {
     * y le agrega los valores del los items en la data
     * */
     list: function () {
-         console.log(this.items);
+        console.log(this.items);
         //Calculamos la factura al listar
         this.calculate_invoice();
         //Asignamos el datatable a la variable
@@ -117,7 +117,32 @@ var vents = {
             }
         });
     }
+};
+
+function formatRepo(repo) {
+    // Cuando esta vacio, para que no de error.
+    if (repo.loading) {
+        return repo.text;
+    }
+    var option = $(
+        '<div class="wrapper container">' +
+        '<div class="row">' +
+        '<div class="col-lg-1">' +
+        '<img src="' + repo.image + '" class="img-fluid img-thumbnail d-block mx-auto rounded">' +
+        '</div>' +
+        '<div class="col-lg-11 text-left shadow-sm">' +
+        //'<br>' +
+        '<p style="margin-bottom: 0;">' +
+        '<b>Nombre:</b> ' + repo.name + '<br>' +
+        '<b>Categoría:</b> ' + repo.cat.name + '<br>' +
+        '<b>PVP:</b> <span class="badge badge-warning">$' + repo.pvp + '</span>' +
+        '</p>' +
+        '</div>' +
+        '</div>' +
+        '</div>');
+    return option;
 }
+
 $(function () {
     $('.select2').select2({
         //podemos escoger temas para el select2
@@ -146,7 +171,7 @@ $(function () {
         vents.calculate_invoice();
     }).val(12);
 
-    //Search Products
+    //Search Products with autocomplete
     $('input[name="search"]').autocomplete({
         //Opciones que se van a mostrar.
         source: function (request, response) {
@@ -181,6 +206,47 @@ $(function () {
             //Limpiamos el formulario de busqueda para escoger otro producto.
             $(this).val('');
         }
+    });
+
+    //Search products with select2
+    $('select[name="search"]').select2({
+        //podemos escoger temas para el select2
+        theme: 'bootstrap4',
+        language: 'es',
+        // Permite borrar la seleccion actual
+        allowClear: true,
+        //https://select2.org/data-sources/ajax
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: window.location.pathname,
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                    action: 'search_products'
+                }
+                return queryParameters;
+            },
+            //Transformamos los daatos recibidos de la VISTA al formato esperado por SELECT2, similar a DONE()
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            },
+        },
+        placeholder: 'Busca una categoria',
+        minimumInputLength: 1,
+        templateResult: formatRepo,
+        /* Concatenamos el on, para que cuando se seleccione un valor se ejecute una funcion */
+    }).on('select2:select', function (e) {
+        //https://select2.org/programmatic-control/events obtener data del select
+        var data = e.params.data;
+        console.log(data);
+        data.cant = 1;
+        data.subtotal = 0.00;
+        vents.add(data);
+        //Limpiamos el formulario de busqueda para escoger otro producto.
+        $(this).val('').trigger('change.select2');
     });
 
     $('.btnRemoveAll').on('click', function () {
@@ -233,14 +299,14 @@ $(function () {
         });
 
     //Clean form os search
-    $('.btnClearSearch').on('click',function (){
+    $('.btnClearSearch').on('click', function () {
         $('input[name="search"]').val('').focus();
     });
 
     //event submit
     $('#form_sale').on('submit', function (e) {
         e.preventDefault();
-        if(vents.items.products.length === 0){
+        if (vents.items.products.length === 0) {
             message_error('Debe haber al menos tener 1 item en su detalle de venta');
             //Terminamos el proceso en el false
             return false;
