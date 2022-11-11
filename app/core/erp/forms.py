@@ -107,7 +107,6 @@ class ProductForm(ModelForm):
             data['error'] = str(e)
         return data
 
-
 class ClientForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -177,7 +176,6 @@ class TestForm(Form):
     search2 = ModelChoiceField(queryset=Product.objects.none(), widget=Select(attrs={
         'class': 'form-control select2'
     }))
-
 
 class SaleForm(ModelForm):
     def __init__(self, *args, **kwargs):
