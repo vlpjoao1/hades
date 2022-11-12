@@ -20,7 +20,7 @@ def category_list(request):
     return render(request, 'category/list.html', data)
 
 
-class CategoryList(ValidatePermissionRequiredMixin  ,ListView):
+class CategoryList(ValidatePermissionRequiredMixin, ListView):
     permission_required = 'erp.view_category'
     model = Category
     template_name = 'category/list.html'
@@ -36,6 +36,24 @@ class CategoryList(ValidatePermissionRequiredMixin  ,ListView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'searchdata':
+                data = []
+                for i in Category.objects.all():
+                    data.append(i.toJSON())
+            else:
+                data['error'] = 'Ha ocurrido un error'
+
+            # data = Category.objects.get(pk=request.POST['id']).toJson()
+        except Exception as e:
+            data['error'] = str(e)
+        # Para serializar los elementos que no sean diccionaros, debes establecer safe=False
+        # Ya que estamos enviando una lista de diccionarios, no un diccionario solo
+        return JsonResponse(data, safe=False)
+
     # Se puede listar solo con modelo y template_name. Hace automaticamente un objects.all
     # Puedes enviar la consulta desde aquí o usar el get_queryset()
     def get_context_data(self, **kwargs):
@@ -46,24 +64,6 @@ class CategoryList(ValidatePermissionRequiredMixin  ,ListView):
         context['list_url'] = reverse_lazy('erp:category_listview')
         return context
 
-    def post(self, request, *args, **kwargs):
-        data = {}
-        try:
-            action = request.POST['action']
-            if action == 'searchdata':
-                data=[]
-                for i in Category.objects.all():
-                    data.append(i.toJSON())
-            else:
-                data['error'] = 'Ha ocurrido un error'
-
-            # data = Category.objects.get(pk=request.POST['id']).toJson()
-        except Exception as e:
-            data['error'] = str(e)
-        #Para serializar los elementos que no sean diccionaros, debes establecer safe=False
-        #Ya que estamos enviando una lista de diccionarios, no un diccionario solo
-        return JsonResponse(data, safe=False)
-
 
 """
     Estas vistas se pueden usar solamente poniendo el modelo, el formulario y el template.
@@ -71,7 +71,7 @@ class CategoryList(ValidatePermissionRequiredMixin  ,ListView):
 """
 
 
-class CategoryCreateView(ValidatePermissionRequiredMixin,CreateView):
+class CategoryCreateView(ValidatePermissionRequiredMixin, CreateView):
     permission_required = 'erp.add_category'
     model = Category
     form_class = CategoryForm
@@ -123,7 +123,7 @@ class CategoryCreateView(ValidatePermissionRequiredMixin,CreateView):
         # return render(request, self.template_name, context)
 
 
-class CategoryUpdateView(ValidatePermissionRequiredMixin,UpdateView):
+class CategoryUpdateView(ValidatePermissionRequiredMixin, UpdateView):
     permission_required = 'erp.change_category'
     model = Category
     form_class = CategoryForm
@@ -158,7 +158,7 @@ class CategoryUpdateView(ValidatePermissionRequiredMixin,UpdateView):
         return context
 
 
-class CategoryDeleteView(ValidatePermissionRequiredMixin,DeleteView):
+class CategoryDeleteView(ValidatePermissionRequiredMixin, DeleteView):
     permission_required = 'erp.delete_category'
     model = Category
     template_name = 'category/delete.html'
@@ -189,15 +189,18 @@ class CategoryDeleteView(ValidatePermissionRequiredMixin,DeleteView):
         context['action'] = 'delete'
         return context
 
+
 """Para que formview guarde/edite/eliminte datos debes sobreescribir los métodos,
     sin sobreescribir, el solo hará las validaciones correspondientes del formulario.
 """
+
+
 class CategoryFormView(FormView):
     form_class = CategoryForm
     template_name = 'category/create.html'
     success_url = reverse_lazy('erp:category_listview')
 
-    #Aqui se manejan los errores del formulario
+    # Aqui se manejan los errores del formulario
     def form_invalid(self, form):
         print(form.errors)
         return super().form_invalid(form)
