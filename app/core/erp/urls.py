@@ -2,7 +2,7 @@ from django.urls import path
 from core.erp.views.category.views import category_list, CategoryList, CategoryCreateView, CategoryUpdateView, \
     CategoryDeleteView, CategoryFormView
 from core.erp.views.client.views import ClientView
-from core.erp.views.dashborad.views import DashboardView
+from core.erp.views.dashboard.views import DashboardView
 from core.erp.views.product.views import ProductList, ProductCreateView, ProductUpdateView, ProductDeleteView
 from core.erp.views.sale.views import SaleCreateView, SaleListView, SaleDeleteView, SaleUpdateView, SaleInvoicePdfView
 from core.erp.views.tests.views import TestView
