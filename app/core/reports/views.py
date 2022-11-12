@@ -1,4 +1,6 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -40,10 +42,31 @@ class ReportSaleView(TemplateView):
                         s.id,
                         s.cli.names,
                         s.date_joined.strftime('%Y-%m-%d'),
-                        format(s.subtotal,'.2f'),
-                        format(s.iva,'.2f'),
-                        format(s.total,'.2f')
+                        format(s.subtotal, '.2f'),
+                        format(s.iva, '.2f'),
+                        format(s.total, '.2f')
                     ])
+                # Este ultimo valor sera para la sumatoria total de todos los subtotales
+                # https://docs.djangoproject.com/en/3.0/topics/db/aggregation/
+                """
+                    - Coalesce lo que hace es que si no obtiene un valor, pone por defecto otro, En este caso si no
+                    obtiene la sumatoria, ponga por defecto 0
+                    - Podemos dejar sin el result= y esto igual nos retorna el valor, pero ponemos esa variable para que
+                    el valor se retorn con ese nombre y obtenerlo asi con el GET para buscar en el dict
+                        sale = Sale.objects.filter().aggregate(Sum('subtotal'))
+                        {'subtotal__sum': Decimal('13719')}
+                """
+                subtotal = search.aggregate(result=Coalesce(Sum('subtotal'), 0)).get('result')
+                iva = search.aggregate(result=Coalesce(Sum('iva'), 0)).get('result')
+                total = search.aggregate(result=Coalesce(Sum('total'), 0)).get('result')
+                data.append([
+                    '----',
+                    '----',
+                    '----',
+                    format(subtotal, '.2f'),
+                    format(iva, '.2f'),
+                    format(total, '.2f')
+                ])
             else:
                 data['error'] = 'Ha ocurrido un error'
 
