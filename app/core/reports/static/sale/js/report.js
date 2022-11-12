@@ -1,10 +1,11 @@
 var date_range = null;
 var date_now = new moment().format('YYYY-MM-DD');
+
 function generate_report(start_date, end_date) {
     var parameters = {
         'action': 'search_report',
-        'start_date': '',
-        'end_date': ''
+        'start_date': date_now,
+        'end_date': date_now
     }
     // Si la variable no es nula va a setear startdate y enddate  https://www.daterangepicker.com/#options
     if (date_range !== null) {
@@ -73,4 +74,5 @@ $(function () {
         date_range = picker;
         generate_report();
     });
+    generate_report();
 });
