@@ -15,7 +15,7 @@ var vents = {
         // Con esta variable iremos obteniendo la suma de todos los productos
         var subtotal = 0.00;
         //obtenemos el % del iva
-        var iva = $('input[name="iva"]').val();
+        var iva = $('input[name="iva%"]').val();
 
         //Si iteramos una lista, obtendremos el index y value, que en este caso sera la POS y el DICT
         $.each(this.items.products, function (pos, dict) {
@@ -25,13 +25,12 @@ var vents = {
         });//Calculamos el subtotal de cada producto
 
         this.items.subtotal = subtotal;
-        //Calculamos el IVA
         this.items.iva = (this.items.subtotal * iva) / 100;
         this.items.total = this.items.subtotal + this.items.iva;
 
         //Seteamos en el formulario subtotal
         $('input[name="subtotal"]').val(this.items.subtotal.toFixed(2));
-        $('input[name="ivacalc"]').val(this.items.iva.toFixed(2));
+        $('input[name="iva"]').val(this.items.iva.toFixed(2));
         $('input[name="total"]').val(this.items.total.toFixed(2));
     },
     add: function (item) {
@@ -158,7 +157,7 @@ $(function () {
 
     //TouchSpin https://www.virtuosoft.eu/code/bootstrap-touchspin/
     // IVA porcentaje
-    $("input[name='iva']").TouchSpin({
+    $("input[name='iva%']").TouchSpin({
         min: 0,
         max: 100,
         step: 1,
@@ -343,5 +342,5 @@ $(function () {
             });
     });
     //Lo llamamos para que se le active el datatable a la tabla ya que no se activaba al menos que se agregara un item
-    //vents.list();
+    vents.list();
 });

@@ -107,6 +107,7 @@ class ProductForm(ModelForm):
             data['error'] = str(e)
         return data
 
+
 class ClientForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -177,6 +178,7 @@ class TestForm(Form):
         'class': 'form-control select2'
     }))
 
+
 class SaleForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -199,32 +201,30 @@ class SaleForm(ModelForm):
         fields = '__all__'
         widgets = {
             'cli': Select(attrs={
-                'autocomplete': 'off',
-                'autofocus':True
-            }),
-            'subtotal': TextInput(attrs={
-                'readonly': True,
-                'class': 'form-control',
-                'type': 'number'
+                'class': 'form-control select2',
+                'style': 'width: 100%'
             }),
             'date_joined': DateInput(
                 format='%Y-%m-%d',
                 attrs={
                     'value': datetime.now().strftime('%Y-%m-%d'),
+                    'autocomplete': 'off',
                     'class': 'form-control datetimepicker-input',
                     'id': 'date_joined',
-                    # referencia al id
                     'data-target': '#date_joined',
                     'data-toggle': 'datetimepicker'
                 }
             ),
+            'iva': TextInput(attrs={
+                'class': 'form-control',
+                'readonly': True,
+            }),
+            'subtotal': TextInput(attrs={
+                'readonly': True,
+                'class': 'form-control',
+            }),
             'total': TextInput(attrs={
                 'readonly': True,
                 'class': 'form-control',
-                'type': 'number'
-            }),
-            'iva': TextInput(attrs={
-                'class': 'form-control',
-                'type': 'text'
             })
         }
