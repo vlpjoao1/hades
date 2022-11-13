@@ -1,4 +1,5 @@
 from datetime import datetime
+from random import randint
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -40,6 +41,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'colorByPoint': True,
                     'data': self.get_graph_sales_products_year_month()
                 }
+            elif action == 'get_graph_online':
+                #Le pasamos numeros random para que se maneje con eso
+                data = {
+                    #aleatorio del 1 al 100
+                    'y': randint(1,100)
+                }
+                print(data)
             else:
                 data['error'] = 'Ha ocurrido un error'
         except Exception as e:
