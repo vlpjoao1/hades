@@ -15,9 +15,16 @@
                 <div id="container"></div>
             </div>
         </div>
+        <br>
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="container-pie"></div>
+            </div>
+        </div>
+        <br>
     </div>
     <script type="application/javascript">
-        Highcharts.chart('container', {
+        var graphics = Highcharts.chart('container', {
             chart: {
                 type: 'column'
             },
@@ -64,14 +71,101 @@
                     borderWidth: 0
                 }
             },
-            series: [{
-                name: 'Porcentaje de Venta',
-                // Para que no se pueda activar o desactivar la grafica https://api.highcharts.com/highcharts/plotOptions
-                showInLegend: false,
-                colorByPoint: true, // Cambiar el color de cada grafica
-                data: {{ graph_sales_year_month | safe  }}
+            //Debido a que pasamos SERIES por el ajax, no lo definimos aca
+            //series: [{
+            //    name: 'Porcentaje de Venta',
+            //    // Para que no se pueda activar o desactivar la grafica https://api.highcharts.com/highcharts/plotOptions
+            //    showInLegend: false,
+            //    colorByPoint: true, // Cambiar el color de cada grafica
+            //    data: {{ graph_sales_year_month | safe  }}
+            //}]
+        });
+        var graphicPie = Highcharts.chart('container-pie', {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Porcentaje de venta de productos por el mes de Junio del año 2022'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                        }
+                    }
+                },
+            });
 
-            }]
+        function graph_sales_year_month() {
+            $.ajax({
+                url: window.location.pathname,
+                type: 'POST',
+                data: {
+                    'action': 'graph_sales_year_month'
+                },
+                dataType: 'json',
+            }).done(function (data) {
+                if (!data.hasOwnProperty('error')) {
+                    // Agregamos el valor SERIES desde aca y le pasamos sus valores https://api.highcharts.com/highcharts/chart.events
+                    graphics.addSeries({
+                        name: 'Porcentaje de venta',
+                        showInLegend: false,
+                        colorByPoint: true,
+                        data: data
+                    });
+                    console.log(data);
+                    /* Lo podemos hacer como abajo ↓ si pasamos el diccionario desde el propio python*/
+                    //graphics.addSeries(data);
+                    return false;
+                }
+                message_error(data.error);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(textStatus + ': ' + errorThrown);
+            }).always(function (data) {
+
+            });
+        };
+        function get_graph_sales_products_year_month() {
+            $.ajax({
+                url: window.location.pathname,
+                type: 'POST',
+                data: {
+                    'action': 'get_graph_sales_products_year_month'
+                },
+                dataType: 'json',
+            }).done(function (data) {
+                if (!data.hasOwnProperty('error')) {
+                    console.log(data);
+                    // Agregamos el valor SERIES desde aca y le pasamos sus valores https://api.highcharts.com/highcharts/chart.events
+                    //Lo hacemos asi porque ya pasamos el diccionario desde python
+                    graphicPie.addSeries(data);
+                    return false;
+                }
+                message_error(data.error);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                alert(textStatus + ': ' + errorThrown);
+            }).always(function (data) {
+
+            });
+        };
+        //Se ejecute esto cuando se inicie el template
+        $(function () {
+            graph_sales_year_month();
+            get_graph_sales_products_year_month();
         });
     </script>
 {% endblock %}
