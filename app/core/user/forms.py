@@ -46,6 +46,8 @@ class UserForm(ModelForm):
                 }
             ),
             'password': PasswordInput(
+                #PAra que se muestre la contrasena en pantalla
+                render_value=True,
                 attrs={
                     'placeholder': 'Ingrese su password',
                     'autocomplete': 'off'

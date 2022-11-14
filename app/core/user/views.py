@@ -109,3 +109,38 @@ class UserCreateView(ValidatePermissionRequiredMixin, CreateView):
         # # si queremos devolver los datos del formulario a la vista, podemos hacerlo así
         # # Enviando el formulario con su instancia de request.POST
         # return render(request, self.template_name, context)
+
+class UserUpdateView(ValidatePermissionRequiredMixin, UpdateView):
+    permission_required = 'user.change_user'
+    model = User
+    form_class = UserForm
+    template_name = 'user/create.html'
+    success_url = reverse_lazy('user:user_listview')
+    url_redirect = success_url
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        #Como object no tiene un valor, tenemos que asignarselo
+        self.object = self.get_object()
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'edit':
+                form = self.get_form()
+                data = form.save()
+            else:
+                data['error'] = 'No ha ingresado a ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Edición de un Usuario'
+        context['entity'] = 'Usuarios'
+        context['list_url'] = self.success_url
+        context['action'] = 'edit'
+        return context
