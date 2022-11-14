@@ -24,7 +24,7 @@ $(function () {
         columnDefs: [
             {
                 targets: [-1],
-                class: 'tex-center',
+                class: 'text-center',
                 orderable: false,
                 render: function (data, type, row) {
                     var buttons='<a href="/erp/category/update/' + row.id + '/" class="btn btn-warning btn-xs btn-flat"><i class="fas fa-edit"></i></a>';

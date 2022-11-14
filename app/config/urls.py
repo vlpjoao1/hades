@@ -25,6 +25,7 @@ urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('admin/', admin.site.urls),
     path('erp/', include(('core.erp.urls','erp'))),
+    path('user/', include(('core.user.urls','user'))),
     path('login/', include(('core.login.urls','accounts'))),
     path('reports/', include(('core.reports.urls','reports'))),
 ]

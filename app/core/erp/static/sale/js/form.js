@@ -69,7 +69,7 @@ var vents = {
             columnDefs: [
                 {
                     targets: [0],
-                    class: 'tex-center',
+                    class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         return '<a rel="remove" type="button" class="btn btn-danger btn-xs btn-flat" style="color:white;"><i class="fas fa-trash-alt"></i></a>';
@@ -78,7 +78,7 @@ var vents = {
                 {
                     //que PVP y subtotal se les anada un $ a su valor
                     targets: [-3, -1],
-                    class: 'tex-center',
+                    class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         return '$' + parseFloat(data).toFixed(2);
@@ -86,7 +86,7 @@ var vents = {
                 },
                 {
                     targets: [-2],
-                    class: 'tex-center',
+                    class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         return '<input type="text" name="cantidad" class="form-control form-control-sm input-sm" autocomplete="off" value="' + data + '">';
