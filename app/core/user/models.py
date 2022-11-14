@@ -22,10 +22,22 @@ class User(AbstractUser):
         """Model_to_dict tiene limitantes, algunos campos no se pueden convertir a dict como FECHAS, IMAGENES, Relaciones
         Para eso podemos usar metodos como exclude para poder excluir esos campos limitantes"""
         item = model_to_dict(self,
-                             exclude=['password','groups','user_permissions'])
+                             exclude=['password', 'groups', 'user_permissions', 'last_login'])
         """ Lo convertimos a algo manejable, ya que del model_to_dict 
          viene asi ('date_joined': datetime.datetime(2022, 11, 3, 19, 2, 13, 124805, tzinfo=<UTC>))"""
-        item['last_login'] = self.last_login.strftime('%Y-%m-%d')
+        if self.last_login:
+            item['last_login'] = self.last_login.strftime('%Y-%m-%d')
         item['date_joined'] = self.date_joined.strftime('%Y-%m-%d')
         item['image'] = self.get_image()
         return item
+
+    """Podemos sobreescribir los metodos de los modelos para que se ejecuten cada vez 
+        que se realice una accion con el modelo
+    """
+
+    def save(self, *args, **kwargs):
+        # si es un nuevo registro
+        if self.pk is None:
+            # se encripta la contrasena
+            self.set_password(self.password)
+        super().save(*args, **kwargs)
