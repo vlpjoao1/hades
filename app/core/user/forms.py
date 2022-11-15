@@ -11,15 +11,13 @@ class UserForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for form in self.visible_fields():
-            form.field.widget.attrs.update({'class': 'form-control'})
         self.fields['first_name'].widget.attrs['autofocus'] = True
 
     class Meta:
         model = User
-        #Para que se muestren en orden en pantalla lo defines aca
-        fields = ('first_name','last_name','username','email','password','image')
-        exclude = ['last_login','date_joined','groups','user_permissions','is_staff','is_superuser','is_active']
+        # Para que se muestren en orden en pantalla lo defines aca
+        fields = ('first_name', 'last_name', 'username', 'email', 'password', 'image', 'groups')
+        exclude = ['last_login', 'date_joined', 'user_permissions', 'is_staff', 'is_superuser', 'is_active']
         widgets = {
             'first_name': TextInput(
                 attrs={
@@ -46,15 +44,24 @@ class UserForm(ModelForm):
                 }
             ),
             'password': PasswordInput(
-                #PAra que se muestre la contrasena en pantalla
+                # PAra que se muestre la contrasena en pantalla
                 render_value=True,
                 attrs={
                     'placeholder': 'Ingrese su password',
                     'autocomplete': 'off'
                 }
             ),
+            'groups': SelectMultiple(attrs={
+                'class': 'form-control select2',
+                'style': 'width: 100%',
+                'multiple': 'multiple'
+            }),
         }
 
+    """
+        Al sobreescribir el metodo save perdemos algunas cosas importantes. Como el guardado de los permisos y los
+        grupos de usuarios.
+    """
     def save(self, commit=True):
         data = {}
         # con esto, recuperamos el formulario
@@ -62,9 +69,9 @@ class UserForm(ModelForm):
         form = super()
         try:
             if form.is_valid():
-                #Contrasena metida en el formulario
+                # Contrasena metida en el formulario
                 pwd = self.cleaned_data['password']
-                #HAce una pausa al guardado y devuelve en una variable el objeto actual
+                # HAce una pausa al guardado y devuelve en una variable el objeto actual
                 u = form.save(commit=False)
                 if u.pk is None:
                     # se encripta la contrasena
@@ -75,6 +82,9 @@ class UserForm(ModelForm):
                     if user.password != pwd:
                         u.set_password(pwd)
                 u.save()
+                #Asi guardamos los grupos, les pasamos la instancia
+                for g in self.cleaned_data['groups']:
+                    u.groups.add(g)
             else:
                 data['error'] = form.errors
         except Exception as e:

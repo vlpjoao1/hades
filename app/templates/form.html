@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-
+{% load widget_tweaks %}
 {% block content %}
     <form action="." method="POST" enctype="multipart/form-data">
         <div class="card card-default">
@@ -33,7 +33,7 @@
                 {% for field in form.visible_fields %}
                     <div class="form-group">
                         <label for="">{{ field.label }}</label>
-                        {{ field }}
+                        {{ field | add_class:'form-control' }}
                     </div>
                 {% endfor %}
             </div>
@@ -65,15 +65,15 @@
             e.preventDefault();
             //aquí hacemos referencia al formulario
             //Esto obtiene a forma de diccionario todos los datos del formulario
-                //Serializa los datos obtenidos del formulario
+            //Serializa los datos obtenidos del formulario
             //var parameters = $(this).serializeArray();
             //El formdata incluye los archivos FILES, Le pasamos el formulario como argumento
             var parameters = new FormData(this);
             // new FormData($('form')[0]) -> Si tenemos varios formularios y queremos escoger 1
             //parameters.forEach((key,value)=>console.log(key+':'+value)); -> si queremos iterar cada valor
-            submit_with_ajax(window.location.pathname,'Notificación','¿Estás seguro de que deseas realizar la siguiente acción?',parameters, function(){
+            submit_with_ajax(window.location.pathname, 'Notificación', '¿Estás seguro de que deseas realizar la siguiente acción?', parameters, function () {
                 location.href = '{{ list_url }}'
             });
-         });
+        });
     </script>
 {% endblock %}

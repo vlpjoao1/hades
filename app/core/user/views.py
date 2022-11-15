@@ -85,7 +85,7 @@ class UserCreateView(ValidatePermissionRequiredMixin, CreateView):
         try:
             action = request.POST['action']
             if action == 'add':
-                form = self.form_class(request.POST)
+                form = self.form_class(request.POST, request.FILES)
                 data = form.save()
                 # if form.is_valid():
                 #     form.save()
