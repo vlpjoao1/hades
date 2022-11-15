@@ -22,13 +22,16 @@ class User(AbstractUser):
         """Model_to_dict tiene limitantes, algunos campos no se pueden convertir a dict como FECHAS, IMAGENES, Relaciones
         Para eso podemos usar metodos como exclude para poder excluir esos campos limitantes"""
         item = model_to_dict(self,
-                             exclude=['password', 'groups', 'user_permissions', 'last_login'])
+                             exclude=['password', 'user_permissions', 'last_login'])
         """ Lo convertimos a algo manejable, ya que del model_to_dict 
          viene asi ('date_joined': datetime.datetime(2022, 11, 3, 19, 2, 13, 124805, tzinfo=<UTC>))"""
         if self.last_login:
             item['last_login'] = self.last_login.strftime('%Y-%m-%d')
         item['date_joined'] = self.date_joined.strftime('%Y-%m-%d')
         item['image'] = self.get_image()
+        #Este es un metodo propio de abstractuser
+        item['full_name'] = self.get_full_name()
+        item['groups'] = [{'id':g.id,'name':g.name} for g in self.groups.all()]
         return item
 
     """Podemos sobreescribir los metodos de los modelos para que se ejecuten cada vez 

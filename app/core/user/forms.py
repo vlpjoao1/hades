@@ -82,6 +82,11 @@ class UserForm(ModelForm):
                     if user.password != pwd:
                         u.set_password(pwd)
                 u.save()
+                """
+                    Cuando quitamos un grupo del formulario, este no se borra de la DB, primero debemos limpiar todos los
+                    grupos y luego guardarlos de nuevo
+                """
+                u.groups.clear()
                 #Asi guardamos los grupos, les pasamos la instancia
                 for g in self.cleaned_data['groups']:
                     u.groups.add(g)
