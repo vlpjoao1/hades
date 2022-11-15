@@ -144,3 +144,34 @@ class UserUpdateView(ValidatePermissionRequiredMixin, UpdateView):
         context['list_url'] = self.success_url
         context['action'] = 'edit'
         return context
+
+class UserDeleteView(ValidatePermissionRequiredMixin, DeleteView):
+    permission_required = 'user.delete_user'
+    model = User
+    template_name = 'user/delete.html'
+    success_url = reverse_lazy('user:user_listview')
+    url_redirect = success_url
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        # lo creamos en el dispatch porque al sobreescribir el metodo POST no existe de una el self.object
+        self.object = self.get_object()
+        return super().dispatch(request, *args, **kwargs)
+
+    # si sobreescribimos el método post, la variable self.object aun no tiene un valor,por lo qe
+    # debemos asignarle el valor a self.object en el dispatch
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            self.object.delete()
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Eliminación de un Usuario'
+        context['entity'] = 'Usuarios'
+        context['list_url'] = self.success_url
+        context['action'] = 'delete'
+        return context

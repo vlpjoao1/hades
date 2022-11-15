@@ -42,8 +42,12 @@ class CategoryList(ValidatePermissionRequiredMixin, ListView):
             action = request.POST['action']
             if action == 'searchdata':
                 data = []
+                contador = 1
                 for i in Category.objects.all():
-                    data.append(i.toJSON())
+                    item = i.toJSON()
+                    item['position']=contador
+                    data.append(item)
+                    contador += 1
             else:
                 data['error'] = 'Ha ocurrido un error'
 

@@ -43,16 +43,30 @@
         </div>
     </form>
     <script>
-       $('form').on('submit', function (e) {
+
+        $('form').on('submit', function (e) {
             e.preventDefault();
             //aquí hacemos referencia al formulario
             //Esto obtiene a forma de diccionario todos los datos del formulario
             var parameters = new FormData(this);
             // new FormData($('form')[0]) -> Si tenemos varios formularios y queremos escoger 1
             //parameters.forEach((key,value)=>console.log(key+':'+value)); ->    si queremos iterar cada valor
-            submit_with_ajax(window.location.pathname,'Notificación','¿Estás seguro de que deseas realizar la siguiente acción?',parameters, function(){
-                location.href = '{{ list_url }}'
+            submit_with_ajax(window.location.pathname, 'Notificación', '¿Estás seguro de que deseas realizar la siguiente acción?', parameters, function () {
+                Swal.fire({
+                    title: 'Alerta!',
+                    text: 'Registro eliminado exitosamente.',
+                    icon: 'success',
+                    //Se cierra a los 2 segundos
+                    timer:2000,
+                    //Cuando se cierre se ejecute la funcion
+                    onClose: () => {
+                        location.href = '{{ list_url }}'
+                    },
+                });/*.then(() => { //cuando presionamos OK
+                    location.href = '
+                {{ list_url }}'
+                });*/
             });
-         });
+        });
     </script>
 {% endblock %}
