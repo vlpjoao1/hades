@@ -35,14 +35,14 @@ class User(AbstractUser):
         que se realice una accion con el modelo
     """
 
-    def save(self, *args, **kwargs):
-        # si es un nuevo registro
-        if self.pk is None:
-            # se encripta la contrasena
-            self.set_password(self.password)
-        else:
-            #Verificamos si la contrasena fue cambiada para saber si encriptarla
-            user = User.objects.get(pk=self.pk)
-            if user.password != self.password:
-                self.set_password(self.password)
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     # si es un nuevo registro
+    #     if self.pk is None:
+    #         # se encripta la contrasena
+    #         self.set_password(self.password)
+    #     else:
+    #         #Verificamos si la contrasena fue cambiada para saber si encriptarla
+    #         user = User.objects.get(pk=self.pk)
+    #         if user.password != self.password:
+    #             self.set_password(self.password)
+    #     super().save(*args, **kwargs)

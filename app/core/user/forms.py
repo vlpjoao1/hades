@@ -62,7 +62,19 @@ class UserForm(ModelForm):
         form = super()
         try:
             if form.is_valid():
-                form.save()
+                #Contrasena metida en el formulario
+                pwd = self.cleaned_data['password']
+                #HAce una pausa al guardado y devuelve en una variable el objeto actual
+                u = form.save(commit=False)
+                if u.pk is None:
+                    # se encripta la contrasena
+                    u.set_password(pwd)
+                else:
+                    # Verificamos si la contrasena fue cambiada para saber si encriptarla
+                    user = User.objects.get(pk=u.pk)
+                    if user.password != pwd:
+                        u.set_password(pwd)
+                u.save()
             else:
                 data['error'] = form.errors
         except Exception as e:
