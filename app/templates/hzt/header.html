@@ -40,15 +40,22 @@
             {% if request.user.groups.all %}
                 <li class="nav-item dropdown show">
                     <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
-                       class="nav-link dropdown-toggle">Perfiles</a>
-                    <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow"
-                        style="left: 0px; right: inherit;">
-                        <!-- Listado de grupos del usuario -->
-                        {% for group in  request.user.groups.all %}
-                            <li><a href="#" class="dropdown-item">{{ group.name }} </a></li>
-
-                        {% endfor %}
-                    </ul>
+                       class="nav-link
+                        {% if request.user.groups.count > 1 %}dropdown-toggle{% endif %}
+                        ">{{ request.session.group.name }}</a>
+                    {# Si el numero de grupos del usuario es mayor a uno se muestre el dropdown, sino no #}
+                    {% if request.user.groups.count > 1 %}
+                        <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow"
+                            style="left: 0px; right: inherit;">
+                            <!-- Listado de grupos del usuario -->
+                            {% for group in  request.user.groups.all %}
+                                {% if group.id != request.session.group.id %}
+                                    <li><a href="{% url 'user:user_change_group' group.id %}"
+                                           class="dropdown-item">{{ group.name }} </a></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 </li>
             {% endif %}
             <li class="nav-item dropdown">

@@ -20,6 +20,12 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
+    def get(self, request, *args, **kwargs):
+        #Llamamos el metodo get_group_session para asignarle el grupo al usuario
+        request.user.get_group_session()
+        #REtornamos denuevo el get para no interrumpir su funcionamiento
+        return super().get(request, *args ,**kwargs)
+
     def post(self, request, *args, **kwargs):
         data = {}
         try:

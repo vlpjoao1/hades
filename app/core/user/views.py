@@ -1,9 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.http import JsonResponse, HttpResponseRedirect
+from django.contrib.auth.models import Group
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
@@ -60,6 +62,8 @@ class UserListView(ValidatePermissionRequiredMixin, ListView):
     Estas vistas se pueden usar solamente poniendo el modelo, el formulario y el template.
     Sobreescribir los métodos, ya es más para personalización.
 """
+
+
 class UserCreateView(ValidatePermissionRequiredMixin, CreateView):
     permission_required = 'user.user'
     model = User
@@ -110,6 +114,7 @@ class UserCreateView(ValidatePermissionRequiredMixin, CreateView):
         # # Enviando el formulario con su instancia de request.POST
         # return render(request, self.template_name, context)
 
+
 class UserUpdateView(ValidatePermissionRequiredMixin, UpdateView):
     permission_required = 'user.change_user'
     model = User
@@ -120,7 +125,7 @@ class UserUpdateView(ValidatePermissionRequiredMixin, UpdateView):
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
-        #Como object no tiene un valor, tenemos que asignarselo
+        # Como object no tiene un valor, tenemos que asignarselo
         self.object = self.get_object()
         return super().dispatch(request, *args, **kwargs)
 
@@ -144,6 +149,7 @@ class UserUpdateView(ValidatePermissionRequiredMixin, UpdateView):
         context['list_url'] = self.success_url
         context['action'] = 'edit'
         return context
+
 
 class UserDeleteView(ValidatePermissionRequiredMixin, DeleteView):
     permission_required = 'user.delete_user'
@@ -175,3 +181,16 @@ class UserDeleteView(ValidatePermissionRequiredMixin, DeleteView):
         context['list_url'] = self.success_url
         context['action'] = 'delete'
         return context
+
+
+class UserChangeGroup(View):
+
+    def get(self, request, *args, **kwargs):
+        try:
+            # con request.session trabajamos con las variables de sesion
+            # https: // docs.djangoproject.com / en / 3.0 / ref / settings /  # sessions
+            request.session['group'] = Group.objects.get(pk=self.kwargs['pk'])
+            # le pasamos la instancia del grupo a la sesion
+        except:
+            pass
+        return HttpResponseRedirect(reverse_lazy('erp:dashboard'))

@@ -1,3 +1,4 @@
+from crum import get_current_request
 from django.contrib.auth.models import AbstractUser, AbstractBaseUser
 from django.db import models
 
@@ -37,6 +38,19 @@ class User(AbstractUser):
     """Podemos sobreescribir los metodos de los modelos para que se ejecuten cada vez 
         que se realice una accion con el modelo
     """
+
+    def get_group_session(self):
+        #Django crum
+        #obtenemos la sesion actual
+        request = get_current_request()
+        #CONSULTAMOS LOS GRUPOS DEL USER actual
+        groups = self.groups.all()
+        if groups.exists():
+            # Si no esta la variable grupo en la sesion, le asignara un grupo a la sesion
+            if 'group' not in request.session:
+                #Le asigna el primer grupo del usuario a la sesion
+                request.session['group'] = groups[0]
+
 
     # def save(self, *args, **kwargs):
     #     # si es un nuevo registro

@@ -146,3 +146,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'user.User'
+
+""" En las sesiones no se pueden serializar los objetos (En este caso instancias de modelos) para poder
+ pasar datos a las sesiones (request.session['group'] = Group.objects.get(pk=self.kwargs['pk']))
+  debemos cambiar el SESSION_SERIALIZER para que no se serialize como un JSON.
+  Esto nos permitira trabajar con objetos dentro de las sesiones"""
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
