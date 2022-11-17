@@ -1,4 +1,6 @@
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import Group
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
@@ -195,6 +197,7 @@ class UserChangeGroup(View):
             pass
         return HttpResponseRedirect(reverse_lazy('erp:dashboard'))
 
+
 class UserProfileView(UpdateView):
     model = User
     form_class = UserProfileForm
@@ -208,6 +211,7 @@ class UserProfileView(UpdateView):
         return super().dispatch(request, *args, **kwargs)
 
     """Como no estamos enviando el objeto a traves de la url, lo definimos aqui para que no haya problemas"""
+
     def get_object(self, queryset=None):
         return self.request.user
 
@@ -228,6 +232,56 @@ class UserProfileView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Edición de perfil'
         context['entity'] = 'Perfil'
+        context['list_url'] = self.success_url
+        context['action'] = 'edit'
+        return context
+
+
+class UserChangePasswordView(FormView):
+    model = User
+    # Este es un formulario propio de Django
+    form_class = PasswordChangeForm
+    template_name = 'user/change_password.html'
+    success_url = reverse_lazy('accounts:login')
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+        #inicializamos el formulario con el usuario actual
+        form = PasswordChangeForm(user=self.request.user)
+        form.fields['old_password'].widget.attrs['placeholder']='Ingrese su contraseña actual'
+        form.fields['new_password1'].widget.attrs['placeholder']='Ingrese su nueva contraseña'
+        form.fields['new_password2'].widget.attrs['placeholder']='Repita su nueva contraseña'
+        return form
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'edit':
+                # https://docs.djangoproject.com/en/4.1/topics/auth/default/
+                """Como no tenemos customizado el metodo save, tenemos que crear las validaciones desde aqui"""
+                form = PasswordChangeForm(user=request.user, data=request.POST)
+                if form.is_valid():
+                    form.save()
+                    #Evita que se cierre la sesion al cambiar la contrasena
+                    #Actualiza la sesion con el nuevo usuario
+                    update_session_auth_hash(request, form.user)
+                else:
+                    #Devolvemos con ajax
+                    data['error'] = form.errors
+            else:
+                data['error'] = 'No ha ingresado a ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Edición de password'
+        context['entity'] = 'Password'
         context['list_url'] = self.success_url
         context['action'] = 'edit'
         return context
