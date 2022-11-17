@@ -116,7 +116,7 @@
             },
         });
         //https://www.highcharts.com/demo/dynamic-update
-        var graphicOnline = Highcharts.chart('container-online', {
+        /*var graphicOnline = Highcharts.chart('container-online', {
             chart: {
                 type: 'spline',
                 animation: Highcharts.svg, // don't animate in old IE
@@ -134,7 +134,7 @@
                                 dataType: 'json',
                             }).done(function (data) {
                                 if (!data.hasOwnProperty('error')) {
-                                    /* Tenemos que pasarle X y Y, Y lo obtenemos de la consulta y X del datetimenow */
+                                    // Tenemos que pasarle X y Y, Y lo obtenemos de la consulta y X del datetimenow
                                     var x = (new Date()).getTime(); // current time
                                     series.addPoint([x, data.y], true, true);
                                     return false;
@@ -208,7 +208,7 @@
                     return data;
                 }())
             }]
-        });
+        });*/
 
         function graph_sales_year_month() {
             $.ajax({
