@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, FormView
 
 from core.erp.mixins import IsSuperuserMixin, ValidatePermissionRequiredMixin
-from core.user.forms import UserForm
+from core.user.forms import UserForm, UserProfileForm
 from core.user.models import User
 
 
@@ -194,3 +194,40 @@ class UserChangeGroup(View):
         except:
             pass
         return HttpResponseRedirect(reverse_lazy('erp:dashboard'))
+
+class UserProfileView(UpdateView):
+    model = User
+    form_class = UserProfileForm
+    template_name = 'user/profile.html'
+    success_url = reverse_lazy('erp:dashboard')
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        # Como object no tiene un valor, tenemos que asignarselo
+        self.object = self.get_object()
+        return super().dispatch(request, *args, **kwargs)
+
+    """Como no estamos enviando el objeto a traves de la url, lo definimos aqui para que no haya problemas"""
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            action = request.POST['action']
+            if action == 'edit':
+                form = self.get_form()
+                data = form.save()
+            else:
+                data['error'] = 'No ha ingresado a ninguna opción'
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Edición de perfil'
+        context['entity'] = 'Perfil'
+        context['list_url'] = self.success_url
+        context['action'] = 'edit'
+        return context
