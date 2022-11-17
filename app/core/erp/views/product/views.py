@@ -12,7 +12,7 @@ from core.erp.models import Product
 
 
 class ProductList(ValidatePermissionRequiredMixin, ListView):
-    permission_required = 'erp.view_product'
+    permission_required = 'view_product'
     model = Product
     template_name = 'product/list.html'
 
@@ -60,7 +60,7 @@ class ProductList(ValidatePermissionRequiredMixin, ListView):
 
 
 class ProductCreateView(ValidatePermissionRequiredMixin, CreateView):
-    permission_required = 'erp.add_product'
+    permission_required = 'add_product'
     model = Product
     form_class = ProductForm
     template_name = 'product/create.html'
@@ -109,7 +109,7 @@ class ProductCreateView(ValidatePermissionRequiredMixin, CreateView):
 
 
 class ProductUpdateView(ValidatePermissionRequiredMixin, UpdateView):
-    permission_required = 'erp.update_product'
+    permission_required = 'change_product'
     model = Product
     form_class = ProductForm
     template_name = 'product/create.html'
@@ -144,7 +144,7 @@ class ProductUpdateView(ValidatePermissionRequiredMixin, UpdateView):
 
 
 class ProductDeleteView(ValidatePermissionRequiredMixin, DeleteView):
-    permission_required = 'erp.delete_product'
+    permission_required = 'delete_product'
     model = Product
     template_name = 'product/delete.html'
     success_url = reverse_lazy('erp:product_listview')
