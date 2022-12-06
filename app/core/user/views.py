@@ -17,7 +17,7 @@ from core.user.models import User
 
 
 class UserListView(ValidatePermissionRequiredMixin, ListView):
-    permission_required = 'user.view_user'
+    permission_required = 'view_user'
     model = User
     template_name = 'user/list.html'
 
@@ -67,7 +67,7 @@ class UserListView(ValidatePermissionRequiredMixin, ListView):
 
 
 class UserCreateView(ValidatePermissionRequiredMixin, CreateView):
-    permission_required = 'user.user'
+    permission_required = 'add_user'
     model = User
     form_class = UserForm
     template_name = 'user/create.html'
@@ -118,7 +118,7 @@ class UserCreateView(ValidatePermissionRequiredMixin, CreateView):
 
 
 class UserUpdateView(ValidatePermissionRequiredMixin, UpdateView):
-    permission_required = 'user.change_user'
+    permission_required = 'change_user'
     model = User
     form_class = UserForm
     template_name = 'user/create.html'
@@ -154,7 +154,7 @@ class UserUpdateView(ValidatePermissionRequiredMixin, UpdateView):
 
 
 class UserDeleteView(ValidatePermissionRequiredMixin, DeleteView):
-    permission_required = 'user.delete_user'
+    permission_required = 'delete_user'
     model = User
     template_name = 'user/delete.html'
     success_url = reverse_lazy('user:user_listview')

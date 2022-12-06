@@ -152,3 +152,12 @@ AUTH_USER_MODEL = 'user.User'
   debemos cambiar el SESSION_SERIALIZER para que no se serialize como un JSON.
   Esto nos permitira trabajar con objetos dentro de las sesiones"""
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+#EMAIL CONFIG
+
+#servidor SMTP
+EMAIL_HOST = 'smtp.gmail.com'
+#puerto del host
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'horusdevmail@gmail.com'
+EMAIL_HOST_PASSWORD = 'qdqvvuukobwxkzqo'
