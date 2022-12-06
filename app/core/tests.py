@@ -1,7 +1,13 @@
+from config.wsgi import *
 import smtplib
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from django.template.loader import render_to_string
+
 from config import settings
+# Para poder usar el modelo de usuario debemos importar django WSGI
+from core.user.models import User
 
 
 def send_email():
@@ -20,11 +26,18 @@ def send_email():
 
         email_to = 'esdeciencia@gmail.com'
         # Construimos el mensaje simple
-        mensaje = MIMEText("""Este es el mensaje
-        de las narices""")
+        # mensaje = MIMEText("""Este es el mensaje de las narices""")
+        # Construimos el mensaje que pueda enviar tambien HTML y archivos
+        mensaje = MIMEMultipart()
         mensaje['From'] = settings.EMAIL_HOST_USER
         mensaje['To'] = email_to
         mensaje['Subject'] = "Tienes un correo"
+
+        # convertimos un template en un string (esto es una funcion de django) y le enviamos parametros
+        content = render_to_string('send_email.html', {'user': User.objects.get(pk=1)})
+        # Adjuntamos el archivo y especificamos su tipo
+        mensaje.attach(MIMEText(content, 'html'))
+
         # Envio del mensaje
         mailServer.sendmail(settings.EMAIL_HOST_USER,
                             email_to,
