@@ -35,22 +35,37 @@
             <!-- /.login-card-body -->
         </div>
         <script type="application/javascript">
-            {% if form.errors %}
-                var errors = '';
-                {% for field in form %}
-                    {% for error in field.errors %}
-                        errors += '{{ error }}\n';
-                    {% endfor %}
-                {% endfor %}
-                {% for error in form.non_field_errors %}
-                    errors += '{{ error }}\n';
-                {% endfor %}
-                Swal.fire({
-                    title: 'Error!',
-                    text: errors,
-                    icon: 'error'
+            $(function () {
+                $('form').on('submit', function (e) {
+                    e.preventDefault();
+                    //aquí hacemos referencia al formulario
+                    //Esto obtiene a forma de diccionario todos los datos del formulario
+                    //Serializa los datos obtenidos del formulario
+                    //var parameters = $(this).serializeArray();
+                    //El formdata incluye los archivos FILES, Le pasamos el formulario como argumento
+                    var parameters = new FormData(this);
+                    // new FormData($('form')[0]) -> Si tenemos varios formularios y queremos escoger 1
+                    //parameters.forEach((key,value)=>console.log(key+':'+value)); -> si queremos iterar cada valor
+                    submit_with_ajax(window.location.pathname, 'Notificación', '¿Estás seguro de resetear tu contraseña?', parameters, function () {
+                        Swal.fire({
+                            title: 'Alerta!',
+                            text: 'Se te ha enviado un correo electrónico con los pasos a aseguir para realizar' +
+                                'el reseteo de contraseña!.',
+                            icon: 'success',
+                            //Se cierra a los 2 segundos
+                            timer: 3000,
+                            //Cuando se cierre se ejecute la funcion
+                            onClose: () => {
+                                location.href = '/'
+                            },
+                        });/*.then(() => { //cuando presionamos OK
+                            location.href = '
+                        //{{ list_url }}'
+                        });*/
+                        //location.href = '/'
+                    });
                 });
-            {% endif %}
+            });
         </script>
     </div>
     <!-- /.login-box -->
