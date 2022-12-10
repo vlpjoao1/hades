@@ -1,4 +1,5 @@
 import smtplib
+import uuid
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -16,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import FormView, RedirectView
 
 from config import settings
-from core.login.forms import ResetPasswordForm
+from core.login.forms import ResetPasswordForm, ChangePasswordForm
 from core.user.models import User
 
 
@@ -74,15 +75,20 @@ class ResetPasswordView(FormView):
     def send_email_reset_pwd(self, user):
         data = {}
         try:
+            """Si debug esta en FALSE obtiene el DOMAIN si esta en TRUE que obtenga el HTTP_HOST"""
+            URL = settings.DOMAIN if not settings.DEBUG else self.request.META['HTTP_HOST']
+
+            user.token = uuid.uuid4()
+            user.save()
             # Establecemos conexion con el servidor smtp de gmail
             # Conectamos al servidor
             mailServer = smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
             """Ehlo es la etapa del protocolo smtp en la que un servidor se presenta entre si. Y verifica
              que no hay errores en el proceso"""
-            #print(mailServer.ehlo())
+            # print(mailServer.ehlo())
             """TLS sirve para mejorar la seguridad de las conexiones SMTP igual que SSL y evitar hackeos"""
             mailServer.starttls()
-            #print(mailServer.ehlo())
+            # print(mailServer.ehlo())
             mailServer.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
 
             email_to = user.email
@@ -96,9 +102,10 @@ class ResetPasswordView(FormView):
 
             # convertimos un template en un string (esto es una funcion de django) y le enviamos parametros
             content = render_to_string('login/send_email.html',
-                                       #variables que le pasaremos al template
-                                       {'link_resetpwd':'',
-                                        'link_home':'',
+                                       # variables que le pasaremos al template
+                                       {'link_resetpwd': 'http://{}/login/change/password/{}/'.format(URL, str(user.token)),
+                                        #Pasamos la url y el token del usuario
+                                        'link_home': 'http://{}'.format(URL),
                                         'user': user
                                         })
             # Adjuntamos el archivo y especificamos su tipo
@@ -118,6 +125,7 @@ class ResetPasswordView(FormView):
             form = ResetPasswordForm(request.POST)  # self.get_form()
             if form.is_valid():
                 user = form.get_user()
+                #print(self.request.META['HTTP_HOST'])
                 data = self.send_email_reset_pwd(user)
             else:
                 data['error'] = form.errors
@@ -131,6 +139,41 @@ class ResetPasswordView(FormView):
         pass
         # login(self.request, form.get_user())
         return HttpResponseRedirect(self.success_url)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Reseteo de contraseña'
+        return context
+
+
+class ChangePasswordView(FormView):
+    form_class = ChangePasswordForm
+    template_name = 'login/changepwd.html'
+    success_url = reverse_lazy('erp:dashboard')
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    """Moddificamos el metodo get, para validar que la url del cambio de contrasena sea valido"""
+    def get(self, request, *args, **kwargs):
+        #asi llamamos a la variable en la url
+        token = self.kwargs['token']
+        #si existe un usuario con ese token que viene del correo, damos paso a la vista
+        if User.objects.filter(token=token).exists():
+            return super().get(request, *args , **kwargs)
+        #Si no existe lo mandamos a la pagina principal
+        return HttpResponseRedirect('/')
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            pass
+        except Exception as e:
+            data['error'] = str(e)
+        # Para serializar los elementos que no sean diccionaros, debes establecer safe=False
+        # Ya que estamos enviando una lista de diccionarios, no un diccionario solo
+        return JsonResponse(data, safe=False)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

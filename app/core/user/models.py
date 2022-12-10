@@ -1,3 +1,5 @@
+import uuid
+
 from crum import get_current_request
 from django.contrib.auth.models import AbstractUser, AbstractBaseUser
 from django.db import models
@@ -12,6 +14,9 @@ from config.settings import MEDIA_URL, STATIC_URL
 
 class User(AbstractUser):
     image = models.ImageField(upload_to='users/%Y/%m/%d', null=True, blank=True)
+    """ #Este token se usará para los cambios de contraseña, par no pasar el id como argumento.
+    Este token se generará en la vista al momento de enviar el correo."""
+    token = models.UUIDField(primary_key=False, null=True, blank=True, editable=False)
 
     def get_image(self):
         if self.image:
