@@ -31,11 +31,14 @@
                     <div class="row">
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary btn-block">
-                                <i class="fas fa-envelope"></i> Resetear Password
+                                <i class="fas fa-lock"></i> Cambiar Password
                             </button>
                         </div>
                         <!-- /.col -->
                     </div>
+                    <p class="text-center mt-2" style="font-size: 13px">
+                        Si deseas volver al LogIn haz click <a href="{% url 'accounts:login' %}">aquí</a>
+                    </p>
                 </form>
             </div>
             <!-- /.login-card-body -->
@@ -52,21 +55,21 @@
                     var parameters = new FormData(this);
                     // new FormData($('form')[0]) -> Si tenemos varios formularios y queremos escoger 1
                     //parameters.forEach((key,value)=>console.log(key+':'+value)); -> si queremos iterar cada valor
-                    submit_with_ajax(window.location.pathname, 'Notificación', '¿Estás seguro de resetear tu contraseña?', parameters, function () {
+                    submit_with_ajax(window.location.pathname, 'Notificación', '¿Estás seguro de cambiar tu contraseña?', parameters, function () {
                         Swal.fire({
                             title: 'Alerta!',
-                            text: 'Se te ha enviado un correo electrónico con los pasos a aseguir para realizar' +
-                                'el reseteo de contraseña!.',
+                            text: 'Tu contraseña ha sido cambiada correctamente!',
                             icon: 'success',
                             //Se cierra a los 2 segundos
-                            timer: 3000,
+                            timer: 4000,
                             //Cuando se cierre se ejecute la funcion
                             onClose: () => {
-                                location.href = '/'
+                                location.href = '{{login_url}}'
                             },
                         });/*.then(() => { //cuando presionamos OK
                             location.href = '
-                        //{{ list_url }}'
+                        //
+                        {{ list_url }}'
                         });*/
                         //location.href = '/'
                     });

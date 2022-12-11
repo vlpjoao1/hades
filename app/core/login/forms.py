@@ -37,3 +37,16 @@ class ChangePasswordForm(forms.Form):
         'class': 'form-control',
         'autocomplete': 'off'
     }))
+
+    def clean(self):
+        cleaned = super().clean()
+        password = cleaned['password']
+        confirmPassword = cleaned['confirmPassword']
+
+        if password != confirmPassword:
+            # Mensaje de error customizado por cada validación
+            self._errors['error'] = self._errors.get('error',self.error_class())
+            self._errors['error'].append(f'Las contraseñas deben ser iguales')
+            #raise forms.ValidationError(f'El usuario *{cleaned["username"]}* no existe')
+        #si no hay erro retornamos la instancia de cleaned
+        return cleaned

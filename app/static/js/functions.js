@@ -1,4 +1,4 @@
-function message_error(obj) {
+function message_error(obj, title='Error', icon='error') {
     //pasamos el objeto, y lo iteremos con each,
     //como es un diccionario usaremos una funcion y le pasaremos la clave y valor
     var html = '';
@@ -14,9 +14,9 @@ function message_error(obj) {
     }
     html += '</ul>';
     Swal.fire({
-        title: 'Error!',
+        title: title,
         html: html,
-        icon: 'error'
+        icon: icon
     });
 };
 
