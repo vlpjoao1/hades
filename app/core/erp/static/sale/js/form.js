@@ -248,6 +248,36 @@ $(function () {
         $(this).val('').trigger('change.select2');
     });
 
+    //search clientes with select
+    $('select[name="cli"]').select2({
+        //podemos escoger temas para el select2
+        theme: 'bootstrap4',
+        language: 'es',
+        // Permite borrar la seleccion actual
+        allowClear: true,
+        //https://select2.org/data-sources/ajax
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: window.location.pathname,
+            data: function (params) {
+                console.log(params);
+                var queryParameters = {
+                    term: params.term,
+                    action: 'search_clients'
+                }
+                return queryParameters;
+            },
+            //Transformamos los daatos recibidos de la VISTA al formato esperado por SELECT2, similar a DONE()
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            },
+        },
+        placeholder: 'Busca un cliente',
+        minimumInputLength: 1,
+    });
     $('.btnRemoveAll').on('click', function () {
         // si no hay productos, muere el proceso ahi
         if (vents.items.products.length === 0) return false;

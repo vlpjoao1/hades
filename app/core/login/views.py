@@ -63,6 +63,7 @@ class LogoutRedirectView(RedirectView):
         return super().dispatch(request, *args, **kwargs)
 
 
+
 class ResetPasswordView(FormView):
     form_class = ResetPasswordForm
     template_name = 'login/resetpwd.html'

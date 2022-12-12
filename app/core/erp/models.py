@@ -87,6 +87,9 @@ class Client(models.Model):
     def __str__(self):
         return self.names
 
+    def get_full_name(self):
+        return f'{self.names } {self.surnames} / {self.dni}'
+
     def toJSON(self):
         item = model_to_dict(self)
         # https: // dustindavis.me / blog / django - tip - get_field_display / Se usa para los choices

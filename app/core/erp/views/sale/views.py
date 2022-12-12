@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
+from django.db.models import Q
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -10,7 +11,7 @@ import json
 
 from core.erp.forms import SaleForm
 from core.erp.mixins import ValidatePermissionRequiredMixin
-from core.erp.models import Sale, Product, DetSale
+from core.erp.models import Sale, Product, DetSale, Client
 
 # xhtmlpdf
 import os
@@ -96,6 +97,20 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                     # Usamos text para select2 y value para autocomplete
                     item['text'] = i.name  # retornamos el nombre del item
                     data.append(item)
+            elif action == 'search_clients':
+                data = []
+                # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
+                term = request.POST['term']
+                # asi se hace un OR en las consultas Django
+                clients = Client.objects.filter(
+                    Q(names__icontains=term) | Q(surnames__icontains=term) | Q(dni__icontains=term))[0:10]
+                for i in clients:
+                    item = i.toJSON()  # retornamos el item (con su id)
+                    item['text'] = i.get_full_name()  # retornamos el nombre del item
+                    # Debemos devolver un dict po r cada valor porque asi lo maneja el autocomplete en el SELECT
+                    # item['value'] = i.names  # retornamos el nombre del item // value es para autocomplete
+                    # Usamos text para select2 y value para autocomplete
+                    data.append(item)
             elif action == 'add':
                 """
                     Al recibir los datos, estamos enviando un dict, pero ese dict se convierte en un str, por eso debemos convertirlo en un dict de vuelta
@@ -120,8 +135,8 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                         det.price = float(i['pvp'])
                         det.subtotal = float(i['subtotal'])
                         det.save()
-                    #Enviamos el ID en el response para manejarlo en el ajax y poder generar la factura
-                    data = {'id':sale.id}
+                    # Enviamos el ID en el response para manejarlo en el ajax y poder generar la factura
+                    data = {'id': sale.id}
             else:
                 data['error'] = 'No ha ingresado ninguna opción'
         except Exception as e:
@@ -170,6 +185,20 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
                     item = i.toJSON()  # retornamos el item
                     # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete en el SELECT
                     item['value'] = i.name  # retornamos el nombre del item
+                    data.append(item)
+            elif action == 'search_clients':
+                data = []
+                # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
+                term = request.POST['term']
+                # asi se hace un OR en las consultas Django
+                clients = Client.objects.filter(
+                    Q(names__icontains=term) | Q(surnames__icontains=term) | Q(dni__icontains=term))[0:10]
+                for i in clients:
+                    item = i.toJSON()  # retornamos el item (con su id)
+                    item['text'] = i.get_full_name()  # retornamos el nombre del item
+                    # Debemos devolver un dict po r cada valor porque asi lo maneja el autocomplete en el SELECT
+                    # item['value'] = i.names  # retornamos el nombre del item // value es para autocomplete
+                    # Usamos text para select2 y value para autocomplete
                     data.append(item)
             elif action == 'edit':
                 """
@@ -322,13 +351,13 @@ class SaleInvoicePdfView(LoginRequiredMixin, View):
                 'ruc': '999999999',
                 'address': 'Carlos Perez'
             },
-            #debido a que no funcionaba con (settings.STATIC_URL,'img') lo hice asi
-            'icon':'{}{}'.format(settings.BASE_DIR, '/static/img/logo.png')
+            # debido a que no funcionaba con (settings.STATIC_URL,'img') lo hice asi
+            'icon': '{}{}'.format(settings.BASE_DIR, '/static/img/logo.png')
         }
         # Create a Django response object, and specify content_type as pdf
         response = HttpResponse(content_type='application/pdf')  # Se va a descargar
-        #si no usamos esto no se descarga.
-        #response['Content-Disposition'] = 'attachment; filename="report.pdf"'  # Va a tener este nombre
+        # si no usamos esto no se descarga.
+        # response['Content-Disposition'] = 'attachment; filename="report.pdf"'  # Va a tener este nombre
         # https://docs.djangoproject.com/en/3.0/topics/templates/
         # find the template and render it
         html = template.render(context=context)

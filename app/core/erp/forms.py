@@ -182,10 +182,15 @@ class TestForm(Form):
 class SaleForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         for form in self.visible_fields():
             # Debido a que no usaremos el template base de form, que agrega el formcontrol, lo haremos desde aqui
             form.field.widget.attrs['class'] = 'form-control'
             form.field.widget.attrs['autocomplete'] = 'off'
+        """Debido a que estamos cargando los clientes con select2,
+        tenemos que decirle que el formulario vendra sin valores, ya que
+        por ser un ModelForm, este se inicializara ya con los clientes"""
+        self.fields['cli'].queryset = Client.objects.none()
         # forma 1
         self.fields['cli'].widget.attrs['autofocus'] = True
         self.fields['cli'].widget.attrs['class'] = 'form-control select2'
