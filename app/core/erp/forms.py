@@ -151,7 +151,10 @@ class ClientForm(ModelForm):
         form = super()
         try:
             if form.is_valid():
-                form.save()
+                """Guardamos el objeto en una variable y la retornamos desde la data
+                esto para poder obtener el objeto desde el save en la vista"""
+                instance = form.save()
+                data = instance.toJSON()
             else:
                 data['error'] = form.errors
         except Exception as e:

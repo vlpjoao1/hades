@@ -80,7 +80,7 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
         context['action'] = 'add'
         # Ya que en el updateview creamos esa variable, aqui la mandamos vacia
         context['det'] = []
-        #le mandamos el formulario de cliente al modal
+        # le mandamos el formulario de cliente al modal
         context['formClient'] = ClientForm
         return context
 
@@ -141,7 +141,7 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                     data = {'id': sale.id}
             elif action == 'create_client':
                 with transaction.atomic():
-                    #podemos guardarlo de esta forma y asi contamos con las validaciones del FORM
+                    # podemos guardarlo de esta forma y asi contamos con las validaciones del FORM
                     formClient = ClientForm(request.POST)
                     """los erroes se retornan como un diccionario, por lo que podemos capturar los errores aqui"""
                     data = formClient.save()
@@ -181,6 +181,16 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
+    def get_form(self, form_class=None):
+        """Ya que esto es un editar, debemos pasarle la instancia al formulario"""
+        instance = self.get_object()
+        form = SaleForm(instance=instance)
+        """ Modificamos el queryset del select y le pasamos el cliente, ya que en el formulario, pusimos que
+         su queryset seria vacio. Le pasamos un Filter porque el queryset necesita un listado, si hacemos GET nos 
+         daria error"""
+        form.fields['cli'].queryset = Client.objects.filter(id=instance.cli.id)
+        return form
+
     def post(self, request, *kargs, **kwargs):
         data = {}
         try:
@@ -210,7 +220,7 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
                     data.append(item)
             elif action == 'create_client':
                 with transaction.atomic():
-                    #podemos guardarlo de esta forma y asi contamos con las validaciones del FORM
+                    # podemos guardarlo de esta forma y asi contamos con las validaciones del FORM
                     formClient = ClientForm(request.POST)
                     """los erroes se retornan como un diccionario, por lo que podemos capturar los errores aqui"""
                     data = formClient.save()

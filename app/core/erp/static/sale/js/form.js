@@ -392,6 +392,10 @@ $(function () {
 
         submit_with_ajax(window.location.pathname, 'Notificacion',
             '¿Estás seguro crear este cliente?', parameters, function (response) {
+                //Le pasamos la opcion que va a seleccionar en el select.
+                /* El full name viene del dict toJSON*/
+                var newOption = new Option(response.full_name, response.id, false, true);
+                $('select[name="cli"]').append(newOption).trigger('change');
                 $('#myModalClient').modal('hide');
             });
     });
