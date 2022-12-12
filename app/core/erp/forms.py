@@ -128,7 +128,7 @@ class ClientForm(ModelForm):
                     'placeholder': 'Ingrese sus apellidos',
                 }
             ),
-            'dir': TextInput(
+            'dni': TextInput(
                 attrs={
                     'placeholder': 'Ingrese sus DNI',
                 }
@@ -206,8 +206,8 @@ class SaleForm(ModelForm):
         fields = '__all__'
         widgets = {
             'cli': Select(attrs={
-                'class': 'form-control select2',
-                'style': 'width: 100%'
+                'class': 'custom-select select2',
+                #'style': 'width: 100%'
             }),
             'date_joined': DateInput(
                 format='%Y-%m-%d',

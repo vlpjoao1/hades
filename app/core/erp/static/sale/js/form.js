@@ -278,6 +278,12 @@ $(function () {
         placeholder: 'Busca un cliente',
         minimumInputLength: 1,
     });
+
+    //add client from form
+    $('.btnAddClient').on('click', () => {
+        $('#myModalClient').modal('show');
+    });
+
     $('.btnRemoveAll').on('click', function () {
         // si no hay productos, muere el proceso ahi
         if (vents.items.products.length === 0) return false;
@@ -369,6 +375,24 @@ $(function () {
                 }, function () {
                     location.href = '/erp/sale/list/';
                 });
+            });
+    });
+
+    // Que cuando se oculte el modal se ejecute una función
+    $('#myModalClient').on('hidden.bs.modal', function (e) {
+        // Que se ejecute el metodo reset
+        $('#formClient').trigger('reset');
+    })
+
+    $('#formClient').on('submit', function (e) {
+        e.preventDefault();
+        var parameters = new FormData(this);
+        //Le añadimos la accion manualmente
+        parameters.append('action', 'create_client');
+
+        submit_with_ajax(window.location.pathname, 'Notificacion',
+            '¿Estás seguro crear este cliente?', parameters, function (response) {
+                $('#myModalClient').modal('hide');
             });
     });
     //Lo llamamos para que se le active el datatable a la tabla ya que no se activaba al menos que se agregara un item

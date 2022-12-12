@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView, ListView, DeleteView, UpdateView, View
 import json
 
-from core.erp.forms import SaleForm
+from core.erp.forms import SaleForm, ClientForm
 from core.erp.mixins import ValidatePermissionRequiredMixin
 from core.erp.models import Sale, Product, DetSale, Client
 
@@ -80,6 +80,8 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
         context['action'] = 'add'
         # Ya que en el updateview creamos esa variable, aqui la mandamos vacia
         context['det'] = []
+        #le mandamos el formulario de cliente al modal
+        context['formClient'] = ClientForm
         return context
 
     def post(self, request, *kargs, **kwargs):
@@ -137,6 +139,12 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                         det.save()
                     # Enviamos el ID en el response para manejarlo en el ajax y poder generar la factura
                     data = {'id': sale.id}
+            elif action == 'create_client':
+                with transaction.atomic():
+                    #podemos guardarlo de esta forma y asi contamos con las validaciones del FORM
+                    formClient = ClientForm(request.POST)
+                    """los erroes se retornan como un diccionario, por lo que podemos capturar los errores aqui"""
+                    data = formClient.save()
             else:
                 data['error'] = 'No ha ingresado ninguna opción'
         except Exception as e:
@@ -200,6 +208,12 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
                     # item['value'] = i.names  # retornamos el nombre del item // value es para autocomplete
                     # Usamos text para select2 y value para autocomplete
                     data.append(item)
+            elif action == 'create_client':
+                with transaction.atomic():
+                    #podemos guardarlo de esta forma y asi contamos con las validaciones del FORM
+                    formClient = ClientForm(request.POST)
+                    """los erroes se retornan como un diccionario, por lo que podemos capturar los errores aqui"""
+                    data = formClient.save()
             elif action == 'edit':
                 """
                     Al recibir los datos, estamos enviando un dict, pero ese dict se convierte en un str, por eso debemos convertirlo en un dict de vuelta
@@ -278,6 +292,7 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
         pasara de ser una lista a un diccionario de diccionarios 
         """
         context['det'] = json.dumps(self.get_details_products())  # Lo convertimos a json pq eso necesitamos en JS
+        context['formClient'] = ClientForm
         return context
 
 
