@@ -48,6 +48,7 @@
                                 <!-- Search product Form -->
                                 <div class="form-group">
                                     <label>Buscador de productos:</label>
+
                                     <div class="input-group">
                                         <!-- Search input with AUTOCOMPLETE -->
                                         <input type="text" class="form-control" name="search"
@@ -61,7 +62,20 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Buscador de productos Select2:</label>
-                                    <select class="form-control select2" name="search" style="width: 100%;"></select>
+                                    <div class="input-group">
+                                        <select class="form-control select2" name="search"></select>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary dropdown-toggle" type="button"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Opciones
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" id="btnSearchProduct"><i class="fas fa-search"></i>Buscar
+                                                    Productos</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                                 <!-- Divisor -->
                                 <hr>
@@ -165,13 +179,29 @@
                         {% endfor %}
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary btn-block btn-flat"><i class="fas fa-save"></i> Guardar Cliente
+                        <button type="submit" class="btn btn-primary btn-block btn-flat"><i class="fas fa-save"></i>
+                            Guardar Cliente
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     </form>
+    <div class="modal fade" id="myModalSearchProducts" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-search"></i>Busqueda de productos</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         vents.items.products = {{ det|safe }};
         console.log({{ det|safe }});

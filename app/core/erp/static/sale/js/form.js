@@ -233,7 +233,7 @@ $(function () {
                 };
             },
         },
-        placeholder: 'Busca una categoria',
+        placeholder: 'Ingrese una descripcion del producto',
         minimumInputLength: 1,
         templateResult: formatRepo,
         /* Concatenamos el on, para que cuando se seleccione un valor se ejecute una funcion */
@@ -383,7 +383,10 @@ $(function () {
         // Que se ejecute el metodo reset
         $('#formClient').trigger('reset');
     })
-
+    // Modal Productos
+    $('#btnSearchProduct').on('click', ()=>{
+        $('#myModalSearchProducts').modal('show');
+    });
     $('#formClient').on('submit', function (e) {
         e.preventDefault();
         var parameters = new FormData(this);
