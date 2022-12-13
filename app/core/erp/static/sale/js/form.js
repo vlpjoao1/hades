@@ -60,8 +60,8 @@ var vents = {
             // Aqui definimos los valores que van en cada posicion de la columna, definimos las columnas de cada posicion
             columns: [
                 {'data': 'id'},
-                {'data': 'name'},
-                {'data': 'cat.name'},
+                {'data': 'full_name'},
+                {'data': 'stock'},
                 {'data': 'pvp'},
                 {'data': 'cant'},
                 {'data': 'subtotal'},
@@ -74,6 +74,14 @@ var vents = {
                     orderable: false,
                     render: function (data, type, row) {
                         return '<a rel="remove" type="button" class="btn btn-danger btn-xs btn-flat" style="color:white;"><i class="fas fa-trash-alt"></i></a>';
+                    }
+                },
+                {
+                    targets: [-4],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span class="badge badge-secondary">'+data+'</span>';
                     }
                 },
                 {
@@ -96,6 +104,7 @@ var vents = {
             ],
             //https://datatables.net/reference/option/rowCallback
             //A medida que se vayan creando registro de la tabla, puedo ir modificando registros de la tabla.
+            //Esto se ejecuta en la creacion de cada row
             rowCallback(row, data, displayNum, displayIndex, dataIndex) {
                 /* Explicacion:
                 *  rowCallback se ejecuta antes de renderizar el dato en pantalla, esto nos permite modificarlo antes de
@@ -104,7 +113,8 @@ var vents = {
                 // En el row buscamos el input llamado cantidad y le agregamos el touchspin
                 $(row).find('input[name="cantidad"]').TouchSpin({
                     min: 0,
-                    max: 100000000,
+                    //agregamos el maximo en base al stock del row
+                    max: data.stock,
                     step: 1,
                 }).on('change', function () {
                     //Recalcular factura al cambiar el IVA
@@ -119,6 +129,7 @@ var vents = {
     }
 };
 
+//Formato del retorno del select2
 function formatRepo(repo) {
     // Cuando esta vacio, para que no de error.
     if (repo.loading) {
@@ -140,7 +151,7 @@ function formatRepo(repo) {
         //'<br>' +
         '<p style="margin-bottom: 0;">' +
         '<b>Nombre:</b> ' + repo.name + '<br>' +
-        '<b>Categoría:</b> ' + repo.cat.name + '<br>' +
+        '<b>Stock:</b> ' + repo.stock + '<br>' +
         '<b>PVP:</b> <span class="badge badge-warning">$' + repo.pvp + '</span>' +
         '</p>' +
         '</div>' +
@@ -415,19 +426,27 @@ $(function () {
                 dataSrc: ""
             },
             columns: [
-                {"data": "name"},
-                {"data": "cat.name"},
+                {"data": "full_name"},
                 {"data": "image"},
+                {"data": "stock"},
                 {"data": "pvp"},
                 {"data": "id"},
             ],
             columnDefs: [
                 {
-                    targets: [-3],
+                    targets: [-4],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         return '<img src="' + data + '" class="img-fluid d-block mx-auto" style="width: 20px; height: 20px;">';
+                    }
+                },
+                {
+                    targets: [-3],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<span class="badge badge-secondary">'+data+'</span>';
                     }
                 },
                 {
@@ -474,15 +493,15 @@ $(function () {
                 dataSrc: ""
             },
             columns: [
-                {"data": "name"},
-                {"data": "cat.name"},
+                {"data": "full_name"},
                 {"data": "image"},
+                {"data": "stock"},
                 {"data": "pvp"},
                 {"data": "id"},
             ],
             columnDefs: [
                 {
-                    targets: [-3],
+                    targets: [-4],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
@@ -490,11 +509,11 @@ $(function () {
                     }
                 },
                 {
-                    targets: [-2],
+                    targets: [-3],
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '$' + parseFloat(data).toFixed(2);
+                        return '<span class="badge badge-secondary">'+data+'</span>';
                     }
                 },
                 {

@@ -91,12 +91,12 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
             if action == 'search_products':
                 data = []
                 # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
-                term = request.POST['term']
+                term = request.POST['term'].strip()  # quita caracteres, por default quita espacios
                 # obtenemos todos los productos
-                products = Product.objects.filter()
+                products = Product.objects.filter(stock__gt=0)  # mayor que
                 # si llega a tener un texto, ahora si lo va a filtrar
                 if len(term):
-                    products = Product.objects.filter(name__icontains=term)
+                    products = products.filter(name__icontains=term)
                 for i in products[0:10]:
                     item = i.toJSON()  # retornamos el item
                     # Debemos devolver un dict por cada valor porque asi lo maneja el AUTOCOMPLETE en el SELECT
@@ -114,7 +114,7 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                 products = Product.objects.filter()
                 # si llega a tener un texto, ahora si lo va a filtrar
                 if len(term):
-                    products = Product.objects.filter(name__icontains=term)
+                    products = products.filter(name__icontains=term, stock__gt=0)
                 for i in products[0:10]:
                     item = i.toJSON()  # retornamos el item
                     item['text'] = i.name  # retornamos el nombre del item
@@ -157,6 +157,10 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                         det.price = float(i['pvp'])
                         det.subtotal = float(i['subtotal'])
                         det.save()
+
+                        #Podemos acceder a la relacion de esta forma o Product.objects.get(pk=det.prod_id)
+                        det.prod.stock -= det.cant
+                        det.prod.save()
                     # Enviamos el ID en el response para manejarlo en el ajax y poder generar la factura
                     data = {'id': sale.id}
             elif action == 'create_client':
@@ -218,12 +222,12 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
             if action == 'search_products':
                 data = []
                 # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
-                term = request.POST['term']
+                term = request.POST['term'].strip()  # quita caracteres, por default quita espacios
                 # obtenemos todos los productos
-                products = Product.objects.filter()
+                products = Product.objects.filter(stock__gt=0)  # mayor que
                 # si llega a tener un texto, ahora si lo va a filtrar
                 if len(term):
-                    products = Product.objects.filter(name__icontains=term)
+                    products = products.filter(name__icontains=term)
                 for i in products[0:10]:
                     item = i.toJSON()  # retornamos el item
                     # Debemos devolver un dict por cada valor porque asi lo maneja el AUTOCOMPLETE en el SELECT
@@ -241,7 +245,7 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
                 products = Product.objects.filter()
                 # si llega a tener un texto, ahora si lo va a filtrar
                 if len(term):
-                    products = Product.objects.filter(name__icontains=term)
+                    products = products.filter(name__icontains=term, stock__gt=0)
                 for i in products[0:10]:
                     item = i.toJSON()  # retornamos el item
                     item['text'] = i.name  # retornamos el nombre del item
@@ -280,6 +284,9 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
                         det.price = float(i['pvp'])
                         det.subtotal = float(i['subtotal'])
                         det.save()
+                        # Podemos acceder a la relacion de esta forma o Product.objects.get(pk=det.prod_id)
+                        det.prod.stock -= det.cant
+                        det.prod.save()
                     data = {'id': sale.id}
             else:
                 data['error'] = 'No ha ingresado ninguna opción'
