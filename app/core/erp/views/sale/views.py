@@ -91,8 +91,13 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
             if action == 'search_products':
                 data = []
                 # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
-                prods = Product.objects.filter(name__icontains=request.POST['term'])[0:10]
-                for i in prods:
+                term = request.POST['term']
+                #obtenemos todos los productos
+                products = Product.objects.filter()
+                #si llega a tener un texto, ahora si lo va a filtrar
+                if len(term):
+                    products = Product.objects.filter(name__icontains=term)
+                for i in products:
                     item = i.toJSON()  # retornamos el item
                     # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete en el SELECT
                     item['value'] = i.name  # retornamos el nombre del item
@@ -198,11 +203,18 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
             if action == 'search_products':
                 data = []
                 # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
-                prods = Product.objects.filter(name__icontains=request.POST['term'])[0:10]
-                for i in prods:
+                term = request.POST['term']
+                # obtenemos todos los productos
+                products = Product.objects.filter()
+                # si llega a tener un texto, ahora si lo va a filtrar
+                if len(term):
+                    products = Product.objects.filter(name__icontains=term)
+                for i in products:
                     item = i.toJSON()  # retornamos el item
                     # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete en el SELECT
                     item['value'] = i.name  # retornamos el nombre del item
+                    # Usamos text para select2 y value para autocomplete
+                    item['text'] = i.name  # retornamos el nombre del item
                     data.append(item)
             elif action == 'search_clients':
                 data = []

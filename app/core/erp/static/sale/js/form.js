@@ -1,4 +1,5 @@
 var tblProducts;
+var tblSearchProducts;
 var vents = {
     //Datos de la cabecera (Sale)
     items: {
@@ -383,10 +384,80 @@ $(function () {
         // Que se ejecute el metodo reset
         $('#formClient').trigger('reset');
     })
+
     // Modal Productos
-    $('#btnSearchProduct').on('click', ()=>{
+    $('#btnSearchProduct').on('click', () => {
+        //Con datatable y ajax buscaremos los productos
+        //Convertimos la tabla en una variable para poder acceder a sus objetos desde una variable
+        tblSearchProducts = $('#tblSearchProducts').DataTable({
+            responsive: true,
+            autoWidth: false,
+            destroy: true,
+            deferRender: true,
+            ajax: {
+                url: window.location.pathname,
+                type: 'POST',
+                data: {
+                    'action': 'search_products',
+                    //Pasamos el valor del formulario como termino de busqueda
+                    'term': $('input[name="search"]').val()
+                },
+                dataSrc: ""
+            },
+            columns: [
+                {"data": "name"},
+                {"data": "cat.name"},
+                {"data": "image"},
+                {"data": "pvp"},
+                {"data": "id"},
+            ],
+            columnDefs: [
+                {
+                    targets: [-3],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<img src="' + data + '" class="img-fluid d-block mx-auto" style="width: 20px; height: 20px;">';
+                    }
+                },
+                {
+                    targets: [-2],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '$' + parseFloat(data).toFixed(2);
+                    }
+                },
+                {
+                    targets: [-1],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var buttons = '<a rel="add" class="btn btn-success btn-xs btn-flat"><i class="fas fa-plus"></i></a> ';
+                        return buttons;
+                    }
+                },
+            ],
+            initComplete: function (settings, json) {
+
+            }
+        });
         $('#myModalSearchProducts').modal('show');
     });
+    // Agregar productos al
+    $('#tblSearchProducts tbody')
+        //cuando eliminamos
+        .on('click', 'a[rel="add"]', function () {
+            //Obtenemos la fila a la que se le hizo click
+            var tr = tblSearchProducts.cell($(this).closest('td, li')).index();
+            //Obtenemos la data
+            var product = tblSearchProducts.row(tr.row).data();
+            //Agregamos los datos al detalle de la venta
+            product.item.cant = 1;
+            product.item.subtotal = 0.00;
+            vents.add(product);
+        });
+
     $('#formClient').on('submit', function (e) {
         e.preventDefault();
         var parameters = new FormData(this);
