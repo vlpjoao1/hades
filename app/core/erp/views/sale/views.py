@@ -92,16 +92,31 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                 data = []
                 # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
                 term = request.POST['term']
-                #obtenemos todos los productos
+                # obtenemos todos los productos
                 products = Product.objects.filter()
-                #si llega a tener un texto, ahora si lo va a filtrar
+                # si llega a tener un texto, ahora si lo va a filtrar
                 if len(term):
                     products = Product.objects.filter(name__icontains=term)
-                for i in products:
+                for i in products[0:10]:
                     item = i.toJSON()  # retornamos el item
-                    # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete en el SELECT
+                    # Debemos devolver un dict por cada valor porque asi lo maneja el AUTOCOMPLETE en el SELECT
                     item['value'] = i.name  # retornamos el nombre del item
-                    # Usamos text para select2 y value para autocomplete
+                    # Usamos text para SELECT y value para autocomplete
+                    # item['text'] = i.name  # retornamos el nombre del item
+                    data.append(item)
+            elif action == 'search_products_select2':
+                data = []
+                # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
+                term = request.POST['term']
+                """Esto nos servira para mantener escrito el texto en el formulario de select"""
+                data.append({'id': term, 'text': term})  # pasamos un id porque siempre requiere un id
+                # obtenemos todos los productos
+                products = Product.objects.filter()
+                # si llega a tener un texto, ahora si lo va a filtrar
+                if len(term):
+                    products = Product.objects.filter(name__icontains=term)
+                for i in products[0:10]:
+                    item = i.toJSON()  # retornamos el item
                     item['text'] = i.name  # retornamos el nombre del item
                     data.append(item)
             elif action == 'search_clients':
@@ -209,26 +224,27 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
                 # si llega a tener un texto, ahora si lo va a filtrar
                 if len(term):
                     products = Product.objects.filter(name__icontains=term)
-                for i in products:
+                for i in products[0:10]:
                     item = i.toJSON()  # retornamos el item
-                    # Debemos devolver un dict por cada valor porque asi lo maneja el autocomplete en el SELECT
+                    # Debemos devolver un dict por cada valor porque asi lo maneja el AUTOCOMPLETE en el SELECT
                     item['value'] = i.name  # retornamos el nombre del item
-                    # Usamos text para select2 y value para autocomplete
-                    item['text'] = i.name  # retornamos el nombre del item
+                    # Usamos text para SELECT y value para autocomplete
+                    # item['text'] = i.name  # retornamos el nombre del item
                     data.append(item)
-            elif action == 'search_clients':
+            elif action == 'search_products_select2':
                 data = []
                 # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
                 term = request.POST['term']
-                # asi se hace un OR en las consultas Django
-                clients = Client.objects.filter(
-                    Q(names__icontains=term) | Q(surnames__icontains=term) | Q(dni__icontains=term))[0:10]
-                for i in clients:
-                    item = i.toJSON()  # retornamos el item (con su id)
-                    item['text'] = i.get_full_name()  # retornamos el nombre del item
-                    # Debemos devolver un dict po r cada valor porque asi lo maneja el autocomplete en el SELECT
-                    # item['value'] = i.names  # retornamos el nombre del item // value es para autocomplete
-                    # Usamos text para select2 y value para autocomplete
+                """Esto nos servira para mantener escrito el texto en el formulario de select"""
+                data.append({'id': term, 'text': term})  # pasamos un id porque siempre requiere un id
+                # obtenemos todos los productos
+                products = Product.objects.filter()
+                # si llega a tener un texto, ahora si lo va a filtrar
+                if len(term):
+                    products = Product.objects.filter(name__icontains=term)
+                for i in products[0:10]:
+                    item = i.toJSON()  # retornamos el item
+                    item['text'] = i.name  # retornamos el nombre del item
                     data.append(item)
             elif action == 'create_client':
                 with transaction.atomic():

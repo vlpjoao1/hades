@@ -124,6 +124,12 @@ function formatRepo(repo) {
     if (repo.loading) {
         return repo.text;
     }
+
+    /* Esto es el dato que estamos mandando de la vista, si el id es 0 retorne el mismo texto para tenerlo
+    * mostrado en el formulario sin que se borre*/
+    if (!Number.isInteger(repo.id)) {
+        return repo.id;
+    }
     var option = $(
         '<div class="wrapper container">' +
         '<div class="row">' +
@@ -223,7 +229,7 @@ $(function () {
             data: function (params) {
                 var queryParameters = {
                     term: params.term,
-                    action: 'search_products'
+                    action: 'search_products_select2'
                 }
                 return queryParameters;
             },
@@ -241,6 +247,10 @@ $(function () {
     }).on('select2:select', function (e) {
         //https://select2.org/programmatic-control/events obtener data del select
         var data = e.params.data;
+        // Si el id del objeto no es entero que no se añada al formulario.
+        if (!Number.isInteger(data.id)) {
+            return false;
+        }
         console.log(data);
         data.cant = 1;
         data.subtotal = 0.00;
@@ -444,6 +454,65 @@ $(function () {
         });
         $('#myModalSearchProducts').modal('show');
     });
+    // Modal Productos Abierto con el form Select2
+    $('#btnSearchProductsSelect2').on('click', () => {
+        //Con datatable y ajax buscaremos los productos
+        //Convertimos la tabla en una variable para poder acceder a sus objetos desde una variable
+        tblSearchProducts = $('#tblSearchProducts').DataTable({
+            responsive: true,
+            autoWidth: false,
+            destroy: true,
+            deferRender: true,
+            ajax: {
+                url: window.location.pathname,
+                type: 'POST',
+                data: {
+                    'action': 'search_products',
+                    //Pasamos el valor del formulario como termino de busqueda
+                    'term': $('select[name="search"]').val()
+                },
+                dataSrc: ""
+            },
+            columns: [
+                {"data": "name"},
+                {"data": "cat.name"},
+                {"data": "image"},
+                {"data": "pvp"},
+                {"data": "id"},
+            ],
+            columnDefs: [
+                {
+                    targets: [-3],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<img src="' + data + '" class="img-fluid d-block mx-auto" style="width: 20px; height: 20px;">';
+                    }
+                },
+                {
+                    targets: [-2],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '$' + parseFloat(data).toFixed(2);
+                    }
+                },
+                {
+                    targets: [-1],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        var buttons = '<a rel="add" class="btn btn-success btn-xs btn-flat"><i class="fas fa-plus"></i></a> ';
+                        return buttons;
+                    }
+                },
+            ],
+            initComplete: function (settings, json) {
+
+            }
+        });
+        $('#myModalSearchProducts').modal('show');
+    });
     // Agregar productos al
     $('#tblSearchProducts tbody')
         //cuando eliminamos
@@ -453,8 +522,8 @@ $(function () {
             //Obtenemos la data
             var product = tblSearchProducts.row(tr.row).data();
             //Agregamos los datos al detalle de la venta
-            product.item.cant = 1;
-            product.item.subtotal = 0.00;
+            product.cant = 1;
+            product.subtotal = 0.00;
             vents.add(product);
         });
 
