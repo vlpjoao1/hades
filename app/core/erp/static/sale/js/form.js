@@ -11,6 +11,15 @@ var vents = {
         //los productos
         products: []
     },
+    //esta funcion devolvera los IDs de los productos en la tabla
+    get_ids: function () {
+        var ids = [];
+        //recorremos el diccionario de los productos
+        $.each(this.items.products, function (key, value) {
+            ids.push(value.id);
+        });
+        return ids;
+    },
     //Calcular factura
     calculate_invoice: function () {
         // Con esta variable iremos obteniendo la suma de todos los productos
@@ -81,7 +90,7 @@ var vents = {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<span class="badge badge-secondary">'+data+'</span>';
+                        return '<span class="badge badge-secondary">' + data + '</span>';
                     }
                 },
                 {
@@ -126,6 +135,7 @@ var vents = {
             initComplete: function (settings, jsong) {
             }
         });
+        console.log(this.get_ids());
     }
 };
 
@@ -198,7 +208,10 @@ $(function () {
                 data: {
                     'action': 'search_products',
                     //De esta manera obtenemos lo que el buscador esta escribiendo
-                    'term': request.term
+                    'term': request.term,
+                    //le pasamos los ids que va a excluir a la consulta
+                    /*https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify*/
+                    ids : JSON.stringify(vents.get_ids())
                 },
                 dataType: 'json',
             }).done(function (data) {
@@ -240,7 +253,10 @@ $(function () {
             data: function (params) {
                 var queryParameters = {
                     term: params.term,
-                    action: 'search_products_select2'
+                    action: 'search_products_select2',
+                    //le pasamos los ids que va a excluir a la consulta
+                    /*https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify*/
+                    ids : JSON.stringify(vents.get_ids())
                 }
                 return queryParameters;
             },
@@ -421,7 +437,8 @@ $(function () {
                 data: {
                     'action': 'search_products',
                     //Pasamos el valor del formulario como termino de busqueda
-                    'term': $('input[name="search"]').val()
+                    'term': $('input[name="search"]').val(),
+                    ids : JSON.stringify(vents.get_ids())
                 },
                 dataSrc: ""
             },
@@ -446,7 +463,7 @@ $(function () {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<span class="badge badge-secondary">'+data+'</span>';
+                        return '<span class="badge badge-secondary">' + data + '</span>';
                     }
                 },
                 {
@@ -488,7 +505,8 @@ $(function () {
                 data: {
                     'action': 'search_products',
                     //Pasamos el valor del formulario como termino de busqueda
-                    'term': $('select[name="search"]').val()
+                    'term': $('select[name="search"]').val(),
+                    ids : JSON.stringify(vents.get_ids())
                 },
                 dataSrc: ""
             },
@@ -513,7 +531,7 @@ $(function () {
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<span class="badge badge-secondary">'+data+'</span>';
+                        return '<span class="badge badge-secondary">' + data + '</span>';
                     }
                 },
                 {
@@ -544,6 +562,8 @@ $(function () {
             product.cant = 1;
             product.subtotal = 0.00;
             vents.add(product);
+            //Eliminamos el item cuando se agregue la tabla principal
+            tblSearchProducts.row($(this).parents('tr')).remove().draw();
         });
 
     $('#formClient').on('submit', function (e) {

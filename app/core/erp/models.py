@@ -90,7 +90,7 @@ class Client(models.Model):
         return self.get_full_name()
 
     def get_full_name(self):
-        return f'{self.names } {self.surnames} / {self.dni}'
+        return f'{self.names} {self.surnames} / {self.dni}'
 
     def toJSON(self):
         item = model_to_dict(self)
@@ -118,6 +118,14 @@ class Sale(models.Model):
     def __str__(self):
         return self.cli.names
 
+    def delete(self, using=None, keep_parents=False):
+        #DetSale.objects.filter(sale=self)
+        for det in self.detsale_set.all():
+            #Modificamos la cantidad del stock del producto con la cantidad del detalle
+            det.prod.stock += det.cant
+            det.prod.save()
+        super(Sale, self).delete()
+
     def toJSON(self):
         item = model_to_dict(self)
         item['cli'] = self.cli.toJSON()
@@ -131,7 +139,7 @@ class Sale(models.Model):
         una relacion directa a detalle sino de detalle a venta, con _set podemos obtener
         esos detalles asociados a esta venta.
         """
-        #Si escribimos self.set deben salirnos todas las relaciones inversas
+        # Si escribimos self.set deben salirnos todas las relaciones inversas
         item['det'] = [i.toJSON() for i in self.detsale_set.all()]
         # Equivale a esto = DeSale.objects.filter(sale_id=self.id)
         return item
@@ -153,10 +161,10 @@ class DetSale(models.Model):
         return self.prod.name
 
     def toJSON(self):
-        #Excluimos la venta ya que no necsitamos la relacion
+        # Excluimos la venta ya que no necsitamos la relacion
         item = model_to_dict(self, exclude=['sale'])
         item['prod'] = self.prod.toJSON()
-        #Lo formateamos a float porque el valor decimal por default, da error al convertirse a JSON
+        # Lo formateamos a float porque el valor decimal por default, da error al convertirse a JSON
         item['price'] = format(self.price, '.2f')
         item['subtotal'] = format(self.subtotal, '.2f')
         return item

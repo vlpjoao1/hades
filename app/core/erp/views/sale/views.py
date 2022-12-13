@@ -90,14 +90,18 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
             action = request.POST['action']
             if action == 'search_products':
                 data = []
+                """Ya que el parametro viene como un JSON, es decir un string, debemos usar json.loads para convertirlo
+                a su tipo correcto, en este caso convierte este STR en una LISTA"""
+                ids_exlude = json.loads(request.POST['ids'])  # convertirmos el STR en un listado
                 # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
                 term = request.POST['term'].strip()  # quita caracteres, por default quita espacios
+
                 # obtenemos todos los productos
                 products = Product.objects.filter(stock__gt=0)  # mayor que
                 # si llega a tener un texto, ahora si lo va a filtrar
                 if len(term):
                     products = products.filter(name__icontains=term)
-                for i in products[0:10]:
+                for i in products.exclude(id__in=ids_exlude)[0:10]:  # excluimos los ids que vienen del template
                     item = i.toJSON()  # retornamos el item
                     # Debemos devolver un dict por cada valor porque asi lo maneja el AUTOCOMPLETE en el SELECT
                     item['value'] = i.name  # retornamos el nombre del item
@@ -108,6 +112,7 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                 data = []
                 # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
                 term = request.POST['term']
+                ids_exlude = json.loads(request.POST['ids'])
                 """Esto nos servira para mantener escrito el texto en el formulario de select"""
                 data.append({'id': term, 'text': term})  # pasamos un id porque siempre requiere un id
                 # obtenemos todos los productos
@@ -115,7 +120,7 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                 # si llega a tener un texto, ahora si lo va a filtrar
                 if len(term):
                     products = products.filter(name__icontains=term, stock__gt=0)
-                for i in products[0:10]:
+                for i in products.exclude(id__in=ids_exlude)[0:10]:
                     item = i.toJSON()  # retornamos el item
                     item['text'] = i.name  # retornamos el nombre del item
                     data.append(item)
@@ -158,7 +163,7 @@ class SaleCreateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Create
                         det.subtotal = float(i['subtotal'])
                         det.save()
 
-                        #Podemos acceder a la relacion de esta forma o Product.objects.get(pk=det.prod_id)
+                        # Podemos acceder a la relacion de esta forma o Product.objects.get(pk=det.prod_id)
                         det.prod.stock -= det.cant
                         det.prod.save()
                     # Enviamos el ID en el response para manejarlo en el ajax y poder generar la factura
@@ -221,14 +226,18 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
             action = request.POST['action']
             if action == 'search_products':
                 data = []
+                """Ya que el parametro viene como un JSON, es decir un string, debemos usar json.loads para convertirlo
+                a su tipo correcto, en este caso convierte este STR en una LISTA"""
+                ids_exlude = json.loads(request.POST['ids'])  # convertirmos el STR en un listado
                 # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
                 term = request.POST['term'].strip()  # quita caracteres, por default quita espacios
+
                 # obtenemos todos los productos
                 products = Product.objects.filter(stock__gt=0)  # mayor que
                 # si llega a tener un texto, ahora si lo va a filtrar
                 if len(term):
                     products = products.filter(name__icontains=term)
-                for i in products[0:10]:
+                for i in products.exclude(id__in=ids_exlude)[0:10]:  # excluimos los ids que vienen del template
                     item = i.toJSON()  # retornamos el item
                     # Debemos devolver un dict por cada valor porque asi lo maneja el AUTOCOMPLETE en el SELECT
                     item['value'] = i.name  # retornamos el nombre del item
@@ -239,6 +248,7 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
                 data = []
                 # Recibimos TERM de la funcion del autocomplete en la variable DATA del AJAX
                 term = request.POST['term']
+                ids_exlude = json.loads(request.POST['ids'])
                 """Esto nos servira para mantener escrito el texto en el formulario de select"""
                 data.append({'id': term, 'text': term})  # pasamos un id porque siempre requiere un id
                 # obtenemos todos los productos
@@ -246,7 +256,7 @@ class SaleUpdateView(LoginRequiredMixin, ValidatePermissionRequiredMixin, Update
                 # si llega a tener un texto, ahora si lo va a filtrar
                 if len(term):
                     products = products.filter(name__icontains=term, stock__gt=0)
-                for i in products[0:10]:
+                for i in products.exclude(id__in=ids_exlude)[0:10]:
                     item = i.toJSON()  # retornamos el item
                     item['text'] = i.name  # retornamos el nombre del item
                     data.append(item)
