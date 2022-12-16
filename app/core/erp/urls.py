@@ -27,7 +27,7 @@ urlpatterns = [
     path('sale/update/<int:pk>/', SaleUpdateView.as_view(), name='sale_updateview'),
     path('sale/invoice/pdf/<int:pk>/', SaleInvoicePdfView.as_view(), name='sale_invoice_pdfview'),
     #dashboard
-    path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    #path('dashboard/', DashboardView.as_view(), name='dashboard'),
     #test
     path('test/', TestView.as_view(), name='test'),
 ]

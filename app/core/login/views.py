@@ -38,7 +38,7 @@ class LoginFormView(LoginView):
 class LoginFormView2(FormView):
     form_class = AuthenticationForm
     template_name = 'login/login.html'
-    success_url = reverse_lazy('erp:dashboard')
+    success_url = reverse_lazy('dashboard')
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -67,7 +67,7 @@ class LogoutRedirectView(RedirectView):
 class ResetPasswordView(FormView):
     form_class = ResetPasswordForm
     template_name = 'login/resetpwd.html'
-    success_url = reverse_lazy('erp:dashboard')
+    success_url = reverse_lazy('dashboard')
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -150,7 +150,7 @@ class ResetPasswordView(FormView):
 class ChangePasswordView(FormView):
     form_class = ChangePasswordForm
     template_name = 'login/changepwd.html'
-    success_url = reverse_lazy('erp:dashboard')
+    success_url = reverse_lazy('dashboard')
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

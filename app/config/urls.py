@@ -15,19 +15,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+
+from core.erp.views.dashboard.views import DashboardView
 from core.homepage.views import IndexView
-from core.login.views import LoginFormView2
+from core.login.views import LoginFormView2, LoginFormView
 
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', IndexView.as_view(), name='index'),
+    # path('', IndexView.as_view(), name='index'),
+    path('', DashboardView.as_view(), name='dashboard'),
     path('admin/', admin.site.urls),
-    path('erp/', include(('core.erp.urls','erp'))),
-    path('user/', include(('core.user.urls','user'))),
-    path('login/', include(('core.login.urls','accounts'))),
-    path('reports/', include(('core.reports.urls','reports'))),
+    path('erp/', include(('core.erp.urls', 'erp'))),
+    path('user/', include(('core.user.urls', 'user'))),
+    path('login/', include(('core.login.urls', 'accounts'))),
+    path('reports/', include(('core.reports.urls', 'reports'))),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

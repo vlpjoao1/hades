@@ -195,14 +195,14 @@ class UserChangeGroup(View):
             # le pasamos la instancia del grupo a la sesion
         except:
             pass
-        return HttpResponseRedirect(reverse_lazy('erp:dashboard'))
+        return HttpResponseRedirect(reverse_lazy('dashboard'))
 
 
 class UserProfileView(UpdateView):
     model = User
     form_class = UserProfileForm
     template_name = 'user/profile.html'
-    success_url = reverse_lazy('erp:dashboard')
+    success_url = reverse_lazy('dashboard')
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):

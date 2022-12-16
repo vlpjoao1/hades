@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = db.SQLITE
+DATABASES = db.POSTGRES
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -135,7 +135,7 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # -- login config
-LOGIN_REDIRECT_URL = '/erp/dashboard/'
+LOGIN_REDIRECT_URL = '/' #to dashboard
 LOGOUT_REDIRECT_URL = '/login/'
 
 # en caso de un PageNotFound que redirija al login
