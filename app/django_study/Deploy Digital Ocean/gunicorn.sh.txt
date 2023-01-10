@@ -1,0 +1,35 @@
+#!/bin/bash
+#lo de arriba es para que se reconozca como un bash
+
+#nombre del servicio
+NAME="horus"
+#ruta del directorioi del proyecto (esto regresa un directorio
+#atras ya que esta dentro de la carpeta deploy
+DJANGODIR=$(dirname $(cd `dirname $0` && pwd))
+#Esta será la ruta donde se va a crear el socket de conexion
+#puede ser cualquier ruta
+SOCKFILE=/tmp/gunicorn-horus.sock
+#donde se van a alojar los logs de errores
+LOGDIR=${DJANGODIR}/logs/gunicorn.log
+#usuario
+USER=joao
+GROUP=usuarios
+#cantidad de procesos que va a utilizar gunicorn
+NUM_WORKERS=5
+#asignamos la configuracion de django
+DJANGO_WSGI_MODULE=config.wsgi
+
+#remorver el socket en caso de que exista
+rm -frv $SOCKFILE
+
+echo $DJANGODIR
+
+cd $DJANGODIR
+#ejecutar gunicorn con las configuraciones dadas
+exec ${DJANGODIR}/env/bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
+  --name $NAME \
+  --workers $NUM_WORKERS \
+  --user=$USER --group=$GROUP \
+  --bind=unix:$SOCKFILE \
+  --log-level=debug \
+  --log-file=$LOGDIR
